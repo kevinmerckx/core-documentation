@@ -1,1 +1,1 @@
-import{p as s,b as e}from"./p-83b3c972.js";s().then(s=>e([["p-vbzlavqc",[[1,"core-tabs",{tabs:[1],selectedTab:[32]}]]]],{resourcesUrl:s}));
+import{p as e,b as s}from"./p-233337e1.js";e().then(e=>s([["p-fgiohuzj",[[1,"core-tabs",{tabs:[1],selectedTab:[32]}]]]],{resourcesUrl:e}));

@@ -23,7 +23,8 @@ export class CoreTabs implements ComponentDidLoad {
           onClick={this.onClickFn(tab)}
         >{tab}</li>
       )}
-    </ol></Host>;
+    </ol>
+    <div class='content'><slot/></div></Host>;
   }
   
   private getSelectedTab() {

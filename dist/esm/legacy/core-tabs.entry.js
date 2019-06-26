@@ -1,4 +1,4 @@
-import { r as registerInstance, c as createEvent, h, H as Host } from './chunk-3ff6dc1b.js';
+import { r as registerInstance, c as createEvent, h, H as Host } from './chunk-ce8242ee.js';
 var CoreTabs = /** @class */ (function () {
     function CoreTabs(hostRef) {
         registerInstance(this, hostRef);
@@ -10,7 +10,7 @@ var CoreTabs = /** @class */ (function () {
     CoreTabs.prototype.render = function () {
         var _this = this;
         var selectedTab = this.getSelectedTab();
-        return h(Host, null, h("ol", null, this.myTabs.map(function (tab) { return h("li", { class: selectedTab === tab ? 'active' : '', onClick: _this.onClickFn(tab) }, tab); })));
+        return h(Host, null, h("ol", null, this.myTabs.map(function (tab) { return h("li", { class: selectedTab === tab ? 'active' : '', onClick: _this.onClickFn(tab) }, tab); })), h("div", { class: 'content' }, h("slot", null)));
     };
     CoreTabs.prototype.getSelectedTab = function () {
         return this.selectedTab || this.myTabs[0];

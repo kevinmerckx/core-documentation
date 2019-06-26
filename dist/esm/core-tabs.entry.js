@@ -1,4 +1,4 @@
-import { r as registerInstance, c as createEvent, h, H as Host } from './chunk-3ff6dc1b.js';
+import { r as registerInstance, c as createEvent, h, H as Host } from './chunk-ce8242ee.js';
 
 class CoreTabs {
     constructor(hostRef) {
@@ -10,7 +10,7 @@ class CoreTabs {
     }
     render() {
         const selectedTab = this.getSelectedTab();
-        return h(Host, null, h("ol", null, this.myTabs.map(tab => h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))));
+        return h(Host, null, h("ol", null, this.myTabs.map(tab => h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))), h("div", { class: 'content' }, h("slot", null)));
     }
     getSelectedTab() {
         return this.selectedTab || this.myTabs[0];

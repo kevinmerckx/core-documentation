@@ -6,7 +6,9 @@ export class CoreTabs {
     render() {
         const selectedTab = this.getSelectedTab();
         return h(Host, null,
-            h("ol", null, this.myTabs.map(tab => h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))));
+            h("ol", null, this.myTabs.map(tab => h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))),
+            h("div", { class: 'content' },
+                h("slot", null)));
     }
     getSelectedTab() {
         return this.selectedTab || this.myTabs[0];

@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-const __chunk_1 = require('./chunk-91dbbeaa.js');
+const __chunk_1 = require('./chunk-4c0cc65d.js');
 
 class CoreTabs {
     constructor(hostRef) {
@@ -14,7 +14,7 @@ class CoreTabs {
     }
     render() {
         const selectedTab = this.getSelectedTab();
-        return __chunk_1.h(__chunk_1.Host, null, __chunk_1.h("ol", null, this.myTabs.map(tab => __chunk_1.h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))));
+        return __chunk_1.h(__chunk_1.Host, null, __chunk_1.h("ol", null, this.myTabs.map(tab => __chunk_1.h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))), __chunk_1.h("div", { class: 'content' }, __chunk_1.h("slot", null)));
     }
     getSelectedTab() {
         return this.selectedTab || this.myTabs[0];
