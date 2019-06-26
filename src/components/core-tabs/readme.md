@@ -12,6 +12,13 @@
 | `tabs`   | `tabs`    |             | `string \| string[]` | `undefined` |
 
 
+## Events
+
+| Event      | Description | Type                  |
+| ---------- | ----------- | --------------------- |
+| `selected` |             | `CustomEvent<string>` |
+
+
 ----------------------------------------------
 
 *Built with [StencilJS](https://stenciljs.com/)*

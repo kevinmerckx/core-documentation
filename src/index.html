@@ -14,5 +14,8 @@
 
   <core-tabs tabs='["yo", "ya"]'></core-tabs>
 
+  <script>
+    document.querySelector('core-tabs').addEventListener('selected',() => console.log('selected'));
+  </script>
 </body>
 </html>

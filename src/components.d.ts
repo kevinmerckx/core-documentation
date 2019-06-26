@@ -29,6 +29,7 @@ declare global {
 
 declare namespace LocalJSX {
   interface CoreTabs extends JSXBase.HTMLAttributes<HTMLCoreTabsElement> {
+    'onSelected'?: (event: CustomEvent<string>) => void;
     'tabs'?: string[] | string;
   }
 

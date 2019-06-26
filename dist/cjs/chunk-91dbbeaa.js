@@ -148,7 +148,7 @@ const patchEsm = () => {
 };
 const patchBrowser = async () => {
     // @ts-ignore
-    const importMeta = (typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('chunk-ac724122.js', document.baseURI).href));
+    const importMeta = (typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('chunk-91dbbeaa.js', document.baseURI).href));
     if (importMeta !== '') {
         return Promise.resolve(new URL('.', importMeta).href);
     }
@@ -728,6 +728,17 @@ const renderVdom = (hostElm, hostRef, cmpMeta, renderFnResults) => {
     // synchronous patch
     patch(oldVNode, renderFnResults);
 };
+
+const safeCall = async (instance, method) => {
+    if (instance && instance[method]) {
+        try {
+            await instance[method]();
+        }
+        catch (e) {
+            consoleError(e);
+        }
+    }
+};
 const scheduleUpdate = async (elm, hostRef, cmpMeta, isInitialLoad) => {
     {
         hostRef.$flags$ |= 16 /* isQueuedForUpdate */;
@@ -744,6 +755,9 @@ const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
     // updateComponent
     {
         hostRef.$flags$ &= ~16 /* isQueuedForUpdate */;
+    }
+    {
+        elm['s-lr'] = false;
     }
     if (isInitialLoad) {
         // DOM WRITE!
@@ -770,8 +784,19 @@ const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
     if (cssVarShim) {
         cssVarShim.updateHost(elm);
     }
+    // set that this component lifecycle rendering has completed
+    {
+        elm['s-lr'] = true;
+    }
     {
         hostRef.$flags$ |= 2 /* hasRendered */;
+    }
+    if (elm['s-rc'].length > 0) {
+        // ok, so turns out there are some child host elements
+        // waiting on this parent element to load
+        // let's fire off all update callbacks waiting
+        elm['s-rc'].forEach(cb => cb());
+        elm['s-rc'].length = 0;
     }
     postUpdateComponent(elm, hostRef);
 };
@@ -787,6 +812,9 @@ const postUpdateComponent = (elm, hostRef, ancestorsActivelyLoadingChildren) => 
                 elm.classList.add(HYDRATED_CLASS);
             }
             {
+                safeCall(instance, 'componentDidLoad');
+            }
+            {
                 hostRef.$onReadyResolve$(elm);
             }
             if (!ancestorComponent) {
@@ -797,6 +825,26 @@ const postUpdateComponent = (elm, hostRef, ancestorsActivelyLoadingChildren) => 
                     setTimeout(() => plt.$flags$ |= 2 /* appLoaded */, 999);
                 }
             }
+        }
+        // load events fire from bottom to top
+        // the deepest elements load first then bubbles up
+        if (ancestorComponent) {
+            // ok so this element already has a known ancestor component
+            // let's make sure we remove this element from its ancestor's
+            // known list of child elements which are actively loading
+            if (ancestorsActivelyLoadingChildren = ancestorComponent['s-al']) {
+                // remove this element from the actively loading map
+                ancestorsActivelyLoadingChildren.delete(elm);
+                // the ancestor's initializeComponent method will do the actual checks
+                // to see if the ancestor is actually loaded or not
+                // then let's call the ancestor's initializeComponent method if there's no length
+                // (which actually ends up as this method again but for the ancestor)
+                if (ancestorsActivelyLoadingChildren.size === 0) {
+                    ancestorComponent['s-al'] = undefined;
+                    ancestorComponent['s-init']();
+                }
+            }
+            hostRef.$ancestorComponent$ = undefined;
         }
         // ( •_•)
         // ( •_•)>⌐■-■
@@ -949,7 +997,17 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
     }
     // we've successfully created a lazy instance
     const ancestorComponent = hostRef.$ancestorComponent$;
-    {
+    if (ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
+        // this is the intial load and this component it has an ancestor component
+        // but the ancestor component has NOT fired its will update lifecycle yet
+        // so let's just cool our jets and wait for the ancestor to continue first
+        ancestorComponent['s-rc'].push(() => 
+        // this will get fired off when the ancestor component
+        // finally gets around to rendering its lazy self
+        // fire off the initial update
+        initializeComponent(elm, hostRef, cmpMeta));
+    }
+    else {
         scheduleUpdate(elm, hostRef, cmpMeta, true);
     }
 };
@@ -963,6 +1021,24 @@ const connectedCallback = (elm, cmpMeta) => {
         if (!(hostRef.$flags$ & 1 /* hasConnected */)) {
             // first time this component has connected
             hostRef.$flags$ |= 1 /* hasConnected */;
+            {
+                // find the first ancestor component (if there is one) and register
+                // this component as one of the actively loading child components for its ancestor
+                let ancestorComponent = elm;
+                while ((ancestorComponent = (ancestorComponent.parentNode || ancestorComponent.host))) {
+                    // climb up the ancestors looking for the first
+                    // component that hasn't finished its lifecycle update yet
+                    if (ancestorComponent['s-init'] && !ancestorComponent['s-lr']) {
+                        // we found this components first ancestor component
+                        // keep a reference to this component's ancestor component
+                        hostRef.$ancestorComponent$ = ancestorComponent;
+                        // ensure there is an array to contain a reference to each of the child components
+                        // and set this component as one of the ancestor's child components it should wait on
+                        (ancestorComponent['s-al'] = ancestorComponent['s-al'] || new Set()).add(elm);
+                        break;
+                    }
+                }
+            }
             // Lazy properties
             // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
             if (cmpMeta.$members$) {
@@ -1011,6 +1087,10 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
                 // @ts-ignore
                 super(self);
                 self = this;
+                {
+                    this['s-lr'] = false;
+                    this['s-rc'] = [];
+                }
                 registerHost(self);
                 if (cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
                     // this component is using shadow dom
@@ -1060,8 +1140,23 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
     head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 };
 
+const createEvent = (ref, name, flags) => {
+    const elm = getElement(ref);
+    return {
+        emit: (detail) => elm.dispatchEvent(new (CustomEvent)(name, {
+            bubbles: !!(flags & 4 /* Bubbles */),
+            composed: !!(flags & 2 /* Composed */),
+            cancelable: !!(flags & 1 /* Cancellable */),
+            detail
+        }))
+    };
+};
+
+const getElement = (ref) => getHostRef(ref).$hostElement$;
+
 exports.Host = Host;
 exports.bootstrapLazy = bootstrapLazy;
+exports.createEvent = createEvent;
 exports.h = h;
 exports.patchBrowser = patchBrowser;
 exports.patchEsm = patchEsm;

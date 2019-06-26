@@ -1,5 +1,8 @@
-import { Host, h } from '@stencil/core';
+import { h, Host } from '@stencil/core';
 export class CoreTabs {
+    componentDidLoad() {
+        this.selected.emit(this.getSelectedTab());
+    }
     render() {
         const selectedTab = this.getSelectedTab();
         return h(Host, null,
@@ -9,14 +12,16 @@ export class CoreTabs {
         return this.selectedTab || this.myTabs[0];
     }
     get myTabs() {
-        console.log(this.tabs);
         if (typeof (this.tabs) === 'string') {
             return JSON.parse(this.tabs);
         }
         return this.tabs || [];
     }
     onClickFn(tab) {
-        return () => this.selectedTab = tab;
+        return () => {
+            this.selectedTab = tab;
+            this.selected.emit(tab);
+        };
     }
     static get is() { return "core-tabs"; }
     static get encapsulation() { return "shadow"; }
@@ -48,4 +53,20 @@ export class CoreTabs {
     static get states() { return {
         "selectedTab": {}
     }; }
+    static get events() { return [{
+            "method": "selected",
+            "name": "selected",
+            "bubbles": true,
+            "cancelable": true,
+            "composed": true,
+            "docs": {
+                "tags": [],
+                "text": ""
+            },
+            "complexType": {
+                "original": "string",
+                "resolved": "string",
+                "references": {}
+            }
+        }]; }
 }
