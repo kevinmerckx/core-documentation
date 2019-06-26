@@ -9,6 +9,9 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
+  interface CoreCode {
+    'code': string;
+  }
   interface CoreTabs {
     'tabs': string[] | string;
   }
@@ -17,23 +20,34 @@ export namespace Components {
 declare global {
 
 
+  interface HTMLCoreCodeElement extends Components.CoreCode, HTMLStencilElement {}
+  var HTMLCoreCodeElement: {
+    prototype: HTMLCoreCodeElement;
+    new (): HTMLCoreCodeElement;
+  };
+
   interface HTMLCoreTabsElement extends Components.CoreTabs, HTMLStencilElement {}
   var HTMLCoreTabsElement: {
     prototype: HTMLCoreTabsElement;
     new (): HTMLCoreTabsElement;
   };
   interface HTMLElementTagNameMap {
+    'core-code': HTMLCoreCodeElement;
     'core-tabs': HTMLCoreTabsElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface CoreCode extends JSXBase.HTMLAttributes<HTMLCoreCodeElement> {
+    'code'?: string;
+  }
   interface CoreTabs extends JSXBase.HTMLAttributes<HTMLCoreTabsElement> {
     'onSelected'?: (event: CustomEvent<string>) => void;
     'tabs'?: string[] | string;
   }
 
   interface IntrinsicElements {
+    'core-code': CoreCode;
     'core-tabs': CoreTabs;
   }
 }

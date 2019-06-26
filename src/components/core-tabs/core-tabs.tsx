@@ -16,15 +16,19 @@ export class CoreTabs implements ComponentDidLoad {
 
   render() {
     const selectedTab = this.getSelectedTab();
-    return <Host><ol>
-      {this.myTabs.map(tab =>
-        <li 
-          class={selectedTab === tab ? 'active' : ''}
-          onClick={this.onClickFn(tab)}
-        >{tab}</li>
-      )}
-    </ol>
-    <div class='content'><slot/></div></Host>;
+    return <Host>
+      <ol>
+        {this.myTabs.map(tab =>
+          <li 
+            class={selectedTab === tab ? 'active' : ''}
+            onClick={this.onClickFn(tab)}
+          >{tab}</li>
+        )}
+      </ol>
+      <div class='content'>
+        <slot/>
+      </div>
+    </Host>;
   }
   
   private getSelectedTab() {

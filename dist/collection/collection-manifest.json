@@ -1,5 +1,6 @@
 {
   "entries": [
+    "components/core-code/core-code.js",
     "components/core-tabs/core-tabs.js"
   ],
   "compiler": {
