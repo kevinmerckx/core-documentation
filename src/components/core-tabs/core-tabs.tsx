@@ -9,7 +9,6 @@ export class CoreTabs {
   @Prop() tabs: string[] | string;
   @State() selectedTab: string;
 
-
   render() {
     const selectedTab = this.getSelectedTab();
     return <Host><ol>
@@ -27,7 +26,6 @@ export class CoreTabs {
   }
 
   private get myTabs(): string[] {
-    console.log(this.tabs);
     if (typeof(this.tabs) === 'string') {
       return JSON.parse(this.tabs);
     }
