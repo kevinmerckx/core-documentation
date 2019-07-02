@@ -1,8 +1,9 @@
 {
   "entries": [
-    "components/core-tabs/core-tabs.js",
     "components/core-code/core-code.js",
-    "components/core-copy-button/core-copy-button.js"
+    "components/core-copy-button/core-copy-button.js",
+    "components/core-tabs/core-tabs.js",
+    "components/core-component-api/core-component-api.js"
   ],
   "compiler": {
     "name": "@stencil/core",

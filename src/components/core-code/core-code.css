@@ -8,24 +8,38 @@
   display: block;
   overflow: auto;
   color: white;
+  background: var(--color-bg-code);
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 
 pre {
   margin: 0;
   padding: 0;
   overflow: auto;
-  background: var(--color-bg-code);
+  height: 100%;
 }
   
 code {
   margin: 10px 0;
+  padding: 0 10px;
   display: block;
+}
+
+.one-line .source-actions {
+  position: initial;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .source-actions {
   position: absolute;
-  right: 5px;
-  top: 0px;
+  right: 10px;
+  top: 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

@@ -3,8 +3,12 @@
   flex-direction: column;
   height: 300px;
   overflow: hidden;
-  margin-top: 20px;
   background-color: var(--color-bg-code);
+}
+
+:host, * {
+  box-sizing: border-box;
+  font-family: 'Lato', sans-serif;
 }
 
 ol {

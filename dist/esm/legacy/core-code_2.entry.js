@@ -33,11 +33,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import { r as registerInstance, h, H as Host, c as createEvent } from './chunk-9e4f6611.js';
+import { r as registerInstance, h, c as createEvent } from './chunk-cd027cbc.js';
 var CoreCode = /** @class */ (function () {
     function CoreCode(hostRef) {
         var _this = this;
         registerInstance(this, hostRef);
+        this.isOneLine = false;
         this.onCopyClicked = function () {
             _this.copyButton.copy(_this.code.firstChild
                 .assignedNodes()[0].textContent);
@@ -45,10 +46,10 @@ var CoreCode = /** @class */ (function () {
     }
     CoreCode.prototype.render = function () {
         var _this = this;
-        return h(Host, null, h("pre", null, h("code", { ref: function (el) { return _this.code = el; } }, h("slot", null))), h("div", { class: 'source-actions' }, h("core-copy-button", { ref: function (el) { return _this.copyButton = el; }, onCopyClicked: this.onCopyClicked })));
+        return h("div", { class: 'container ' + (this.isOneLine ? 'one-line' : '') }, h("pre", null, h("code", { ref: function (el) { return _this.code = el; } }, h("slot", null))), h("div", { class: 'source-actions' }, h("core-copy-button", { ref: function (el) { return _this.copyButton = el; }, onCopyClicked: this.onCopyClicked })));
     };
     Object.defineProperty(CoreCode, "style", {
-        get: function () { return "*,:host{-webkit-box-sizing:border-box;box-sizing:border-box}:host{position:relative;display:block;color:#fff}:host,pre{overflow:auto}pre{margin:0;padding:0;background:var(--color-bg-code)}code{margin:10px 0;display:block}.source-actions{position:absolute;right:5px;top:0;display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column;-ms-flex-align:end;align-items:flex-end}"; },
+        get: function () { return "*,:host{-webkit-box-sizing:border-box;box-sizing:border-box}:host{position:relative;display:block;overflow:auto;color:#fff;background:var(--color-bg-code)}.container{display:-ms-flexbox;display:flex;-ms-flex-direction:row;flex-direction:row;-ms-flex-align:center;align-items:center}pre{margin:0;padding:0;overflow:auto;height:100%}code{margin:10px 0;padding:0 10px;display:block}.one-line .source-actions{position:static;margin-left:10px;margin-right:10px}.source-actions{position:absolute;right:10px;top:10px;display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column;-ms-flex-align:end;align-items:flex-end}"; },
         enumerable: true,
         configurable: true
     });
@@ -88,7 +89,7 @@ var CoreCodeComponent = /** @class */ (function () {
         document.body.removeChild(el);
     };
     Object.defineProperty(CoreCodeComponent, "style", {
-        get: function () { return ":host{display:block}*,:host{-webkit-box-sizing:border-box;box-sizing:border-box}button{border:none;-webkit-box-shadow:none;box-shadow:none;background:transparent;height:auto;line-height:normal;color:var(--color-text-code);outline:none;padding:0;cursor:pointer}button:hover{color:#fff}button{position:relative;overflow:visible}button .tooltip{display:none;position:absolute;top:50%;left:0;-webkit-transform:translate(calc(-100% - 5px),-50%);transform:translate(calc(-100% - 5px),-50%);margin-right:3px;padding:2px 3px;color:#fff;background:#000}button:hover .tooltip{display:block}"; },
+        get: function () { return ":host{display:block}*,:host{-webkit-box-sizing:border-box;box-sizing:border-box;font-family:Lato,sans-serif}button{border:none;-webkit-box-shadow:none;box-shadow:none;background:transparent;height:auto;line-height:normal;color:var(--color-text-code);outline:none;padding:0;cursor:pointer}button:hover{color:#fff}button{position:relative;overflow:visible}button .tooltip{display:none;position:absolute;top:50%;left:0;-webkit-transform:translate(calc(-100% - 5px),-50%);transform:translate(calc(-100% - 5px),-50%);margin-right:3px;padding:2px 3px;color:#fff;background:#000}button:hover .tooltip{display:block}"; },
         enumerable: true,
         configurable: true
     });

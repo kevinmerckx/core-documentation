@@ -1,8 +1,8 @@
-import { a as patchEsm, b as bootstrapLazy } from './chunk-9e4f6611.js';
+import { a as patchEsm, b as bootstrapLazy } from './chunk-cd027cbc.js';
 
 const defineCustomElements = (win, options) => {
   return patchEsm().then(() => {
-    bootstrapLazy([["core-tabs",[[1,"core-tabs",{"tabs":[1],"selectedTab":[32]}]]],["core-code_2",[[1,"core-code"],[1,"core-copy-button",{"copied":[32],"copy":[64]}]]]], options);
+    bootstrapLazy([["core-component-api",[[1,"core-component-api",{"selector":[1],"inputs":[16],"outputs":[16],"methods":[16]}]]],["core-tabs",[[1,"core-tabs",{"tabs":[1],"selectedTab":[32]}]]],["core-code_2",[[1,"core-code",{"isOneLine":[4,"is-one-line"]}],[1,"core-copy-button",{"copied":[32],"copy":[64]}]]]], options);
   });
 };
 

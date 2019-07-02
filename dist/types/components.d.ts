@@ -6,10 +6,22 @@
 
 
 import { HTMLStencilElement, JSXBase } from './stencil.core';
-
+import {
+  CoreInputType,
+  CoreMethodType,
+  CoreOutputType,
+} from './components/core-component-api/core-component-api';
 
 export namespace Components {
-  interface CoreCode {}
+  interface CoreCode {
+    'isOneLine': boolean;
+  }
+  interface CoreComponentApi {
+    'inputs': CoreInputType[];
+    'methods': CoreMethodType[];
+    'outputs': CoreOutputType[];
+    'selector': string;
+  }
   interface CoreCopyButton {
     'copy': (valueToCopy: string) => Promise<void>;
   }
@@ -27,6 +39,12 @@ declare global {
     new (): HTMLCoreCodeElement;
   };
 
+  interface HTMLCoreComponentApiElement extends Components.CoreComponentApi, HTMLStencilElement {}
+  var HTMLCoreComponentApiElement: {
+    prototype: HTMLCoreComponentApiElement;
+    new (): HTMLCoreComponentApiElement;
+  };
+
   interface HTMLCoreCopyButtonElement extends Components.CoreCopyButton, HTMLStencilElement {}
   var HTMLCoreCopyButtonElement: {
     prototype: HTMLCoreCopyButtonElement;
@@ -40,13 +58,22 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'core-code': HTMLCoreCodeElement;
+    'core-component-api': HTMLCoreComponentApiElement;
     'core-copy-button': HTMLCoreCopyButtonElement;
     'core-tabs': HTMLCoreTabsElement;
   }
 }
 
 declare namespace LocalJSX {
-  interface CoreCode extends JSXBase.HTMLAttributes<HTMLCoreCodeElement> {}
+  interface CoreCode extends JSXBase.HTMLAttributes<HTMLCoreCodeElement> {
+    'isOneLine'?: boolean;
+  }
+  interface CoreComponentApi extends JSXBase.HTMLAttributes<HTMLCoreComponentApiElement> {
+    'inputs'?: CoreInputType[];
+    'methods'?: CoreMethodType[];
+    'outputs'?: CoreOutputType[];
+    'selector'?: string;
+  }
   interface CoreCopyButton extends JSXBase.HTMLAttributes<HTMLCoreCopyButtonElement> {
     'onCopyClicked'?: (event: CustomEvent<any>) => void;
   }
@@ -57,6 +84,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'core-code': CoreCode;
+    'core-component-api': CoreComponentApi;
     'core-copy-button': CoreCopyButton;
     'core-tabs': CoreTabs;
   }

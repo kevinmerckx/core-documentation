@@ -5,6 +5,13 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property    | Attribute     | Description | Type      | Default |
+| ----------- | ------------- | ----------- | --------- | ------- |
+| `isOneLine` | `is-one-line` |             | `boolean` | `false` |
+
+
 ## Dependencies
 
 ### Depends on
