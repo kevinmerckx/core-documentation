@@ -4,7 +4,7 @@ export declare class CoreTabs implements ComponentDidLoad {
     selectedTab: string;
     selected: EventEmitter<string>;
     componentDidLoad(): void;
-    render(): any;
+    render(): any[];
     private getSelectedTab;
     private readonly myTabs;
     private onClickFn;

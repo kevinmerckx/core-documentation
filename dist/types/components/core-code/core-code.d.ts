@@ -1,4 +1,6 @@
 export declare class CoreCode {
-    code: string;
+    private code;
+    private copyButton;
     render(): any;
+    private onCopyClicked;
 }

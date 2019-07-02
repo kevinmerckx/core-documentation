@@ -1,14 +1,15 @@
-import { h, Host } from '@stencil/core';
+import { h } from '@stencil/core';
 export class CoreTabs {
     componentDidLoad() {
         this.selected.emit(this.getSelectedTab());
     }
     render() {
         const selectedTab = this.getSelectedTab();
-        return h(Host, null,
+        return [
             h("ol", null, this.myTabs.map(tab => h("li", { class: selectedTab === tab ? 'active' : '', onClick: this.onClickFn(tab) }, tab))),
             h("div", { class: 'content' },
-                h("slot", null)));
+                h("slot", null))
+        ];
     }
     getSelectedTab() {
         return this.selectedTab || this.myTabs[0];

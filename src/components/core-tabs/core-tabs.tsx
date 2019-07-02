@@ -1,4 +1,4 @@
-import { Component, ComponentDidLoad, Event, EventEmitter, h, Host, Prop, State } from '@stencil/core';
+import { Component, ComponentDidLoad, Event, EventEmitter, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'core-tabs',
@@ -16,19 +16,17 @@ export class CoreTabs implements ComponentDidLoad {
 
   render() {
     const selectedTab = this.getSelectedTab();
-    return <Host>
+    return [
       <ol>
         {this.myTabs.map(tab =>
-          <li 
+          <li
             class={selectedTab === tab ? 'active' : ''}
             onClick={this.onClickFn(tab)}
           >{tab}</li>
         )}
-      </ol>
-      <div class='content'>
-        <slot/>
-      </div>
-    </Host>;
+      </ol>,
+      <div class='content'><slot/></div>
+    ];
   }
   
   private getSelectedTab() {

@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host } from '@stencil/core';
 
 @Component({
   tag: 'core-code',
@@ -6,15 +6,26 @@ import { Component, h, Host, Prop } from '@stencil/core';
   shadow: true
 })
 export class CoreCode {
-  @Prop() code = '';
+  private code: HTMLElement;
+  private copyButton: HTMLCoreCopyButtonElement;
 
   render() {
     return <Host>
-      <pre><code>{this.code}</code></pre>
+      <pre><code ref={el => this.code = el}><slot/></code></pre>
       <div class='source-actions'>
-        <slot/>
+        <core-copy-button
+          ref={el => this.copyButton = el}
+          onCopyClicked={this.onCopyClicked}
+        />
       </div>
     </Host>;
+  }
+
+  private onCopyClicked = () => {
+    this.copyButton.copy(
+      (this.code.firstChild as HTMLSlotElement)
+        .assignedNodes()[0].textContent
+    );
   }
   
 }

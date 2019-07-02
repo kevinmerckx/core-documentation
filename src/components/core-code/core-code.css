@@ -1,0 +1,32 @@
+
+:host, * {
+  box-sizing: border-box;
+}
+
+:host {
+  position: relative;
+  display: block;
+  overflow: auto;
+  color: white;
+}
+
+pre {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  background: var(--color-bg-code);
+}
+  
+code {
+  margin: 10px 0;
+  display: block;
+}
+
+.source-actions {
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}

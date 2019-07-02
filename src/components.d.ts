@@ -9,8 +9,9 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
-  interface CoreCode {
-    'code': string;
+  interface CoreCode {}
+  interface CoreCopyButton {
+    'copy': (valueToCopy: string) => Promise<void>;
   }
   interface CoreTabs {
     'tabs': string[] | string;
@@ -26,6 +27,12 @@ declare global {
     new (): HTMLCoreCodeElement;
   };
 
+  interface HTMLCoreCopyButtonElement extends Components.CoreCopyButton, HTMLStencilElement {}
+  var HTMLCoreCopyButtonElement: {
+    prototype: HTMLCoreCopyButtonElement;
+    new (): HTMLCoreCopyButtonElement;
+  };
+
   interface HTMLCoreTabsElement extends Components.CoreTabs, HTMLStencilElement {}
   var HTMLCoreTabsElement: {
     prototype: HTMLCoreTabsElement;
@@ -33,13 +40,15 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'core-code': HTMLCoreCodeElement;
+    'core-copy-button': HTMLCoreCopyButtonElement;
     'core-tabs': HTMLCoreTabsElement;
   }
 }
 
 declare namespace LocalJSX {
-  interface CoreCode extends JSXBase.HTMLAttributes<HTMLCoreCodeElement> {
-    'code'?: string;
+  interface CoreCode extends JSXBase.HTMLAttributes<HTMLCoreCodeElement> {}
+  interface CoreCopyButton extends JSXBase.HTMLAttributes<HTMLCoreCopyButtonElement> {
+    'onCopyClicked'?: (event: CustomEvent<any>) => void;
   }
   interface CoreTabs extends JSXBase.HTMLAttributes<HTMLCoreTabsElement> {
     'onSelected'?: (event: CustomEvent<string>) => void;
@@ -48,6 +57,7 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'core-code': CoreCode;
+    'core-copy-button': CoreCopyButton;
     'core-tabs': CoreTabs;
   }
 }

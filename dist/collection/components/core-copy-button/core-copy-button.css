@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+:host, * {
+  box-sizing: border-box;
+}
+
+button {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  height: auto;
+  line-height: normal;
+  color: var(--color-text-code);
+  outline: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+button:hover {
+    color: white;
+}
+
+button {
+  position: relative;
+  overflow: visible;
+}
+
+button .tooltip {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(calc(-100% - 5px), -50%);
+  margin-right: 3px;
+  padding: 2px 3px;
+  color: white;
+  background: black;
+}
+
+button:hover .tooltip {
+  display: block;
+}

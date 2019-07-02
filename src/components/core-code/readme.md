@@ -5,12 +5,18 @@
 <!-- Auto Generated Below -->
 
 
-## Properties
+## Dependencies
 
-| Property | Attribute | Description | Type     | Default |
-| -------- | --------- | ----------- | -------- | ------- |
-| `inCode` | `in-code` |             | `string` | `''`    |
+### Depends on
 
+- [core-copy-button](../core-copy-button)
+
+### Graph
+```mermaid
+graph TD;
+  core-code --> core-copy-button
+  style core-code fill:#f9f,stroke:#333,stroke-width:4px
+```
 
 ----------------------------------------------
 

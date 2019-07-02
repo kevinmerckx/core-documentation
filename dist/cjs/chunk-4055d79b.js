@@ -1,9 +1,9 @@
-const BUILD = {"allRenderFn":true,"cmpDidLoad":true,"cmpDidUnload":false,"cmpDidUpdate":false,"cmpDidRender":false,"cmpWillLoad":false,"cmpWillUpdate":false,"cmpWillRender":false,"connectedCallback":false,"disconnectedCallback":false,"element":false,"event":true,"hasRenderFn":true,"lifecycle":true,"hostListener":false,"hostListenerTargetWindow":false,"hostListenerTargetDocument":false,"hostListenerTargetBody":false,"hostListenerTargetParent":false,"hostListenerTarget":false,"member":true,"method":false,"mode":false,"noVdomRender":false,"observeAttribute":true,"prop":true,"propBoolean":false,"propNumber":false,"propString":true,"propMutable":false,"reflect":false,"scoped":false,"shadowDom":true,"slot":true,"slotRelocation":true,"state":true,"style":true,"svg":false,"updatable":true,"vdomAttribute":true,"vdomClass":true,"vdomFunctional":true,"vdomKey":true,"vdomListener":true,"vdomRef":true,"vdomRender":true,"vdomStyle":true,"vdomText":true,"watchCallback":false,"taskQueue":true,"lazyLoad":true,"hydrateServerSide":false,"cssVarShim":true,"hydrateClientSide":false,"isDebug":false,"isDev":true,"lifecycleDOMEvents":false,"profile":false,"hotModuleReplacement":true,"cssAnnotations":true};
+'use strict';
+
 const NAMESPACE = 'core-documentation';
 
 const win = window;
 const doc = document;
-const H = HTMLElement;
 const plt = {
     $flags$: 0,
     $resourcesUrl$: '',
@@ -11,33 +11,21 @@ const plt = {
     ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
     rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
 };
-const supportsShadowDom = (BUILD.shadowDom) ? !!doc.documentElement.attachShadow : false;
-const supportsListenerOptions = /*@__PURE__*/ (() => {
-    let supportsListenerOptions = false;
-    try {
-        doc.addEventListener('e', null, Object.defineProperty({}, 'passive', {
-            get() { supportsListenerOptions = true; }
-        }));
-    }
-    catch (e) { }
-    return supportsListenerOptions;
-})();
-const supportsConstructibleStylesheets = BUILD.constructableCSS ? /*@__PURE__*/ (() => {
+const supportsShadowDom = !!doc.documentElement.attachShadow;
+const supportsConstructibleStylesheets = (() => {
     try {
         new CSSStyleSheet();
         return true;
     }
     catch (e) { }
     return false;
-})() : false;
-
-const Context = {};
+})();
 
 const hostRefs = new WeakMap();
 const getHostRef = (ref) => hostRefs.get(ref);
 const registerInstance = (lazyInstance, hostRef) => hostRefs.set(hostRef.$lazyInstance$ = lazyInstance, hostRef);
 const registerHost = (elm) => {
-    if (BUILD.lazyLoad) {
+    {
         const hostRef = {
             $flags$: 0,
             $hostElement$: elm,
@@ -46,12 +34,6 @@ const registerHost = (elm) => {
         hostRef.$onReadyPromise$ = new Promise(r => hostRef.$onReadyResolve$ = r);
         return hostRefs.set(elm, hostRef);
     }
-    else {
-        return hostRefs.set(elm, {
-            $flags$: 0,
-            $instanceValues$: new Map()
-        });
-    }
 };
 const isMemberInElement = (elm, memberName) => memberName in elm;
 
@@ -59,18 +41,16 @@ const consoleError = (e) => console.error(e);
 
 const loadModule = (cmpMeta, hostRef, hmrVersionId) => {
     // loadModuleImport
-    const bundleId = (BUILD.mode && typeof cmpMeta.$lazyBundleIds$ !== 'string')
-        ? cmpMeta.$lazyBundleIds$[hostRef.$modeName$]
-        : cmpMeta.$lazyBundleIds$;
-    return __sc_import_core_documentation(
+    const bundleId = cmpMeta.$lazyBundleIds$;
+    return Promise.resolve(require(
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
+    `./${bundleId}.entry.js${''}`)).then(importedModule => importedModule[cmpMeta.$tagName$.replace(/-/g, '_')], consoleError);
 };
 
 const styles = new Map();
-const cssVarShim = BUILD.cssVarShim ? /*@__PURE__*/ win.__stencil_cssshim : false;
+const cssVarShim = win.__stencil_cssshim;
 
 let queueCongestion = 0;
 let queuePending = false;
@@ -139,14 +119,7 @@ const flush = () => {
         queueCongestion = 0;
     }
 };
-const nextTick = /*@__PURE__*/ (cb) => Promise.resolve().then(cb);
-const readTask = /*@__PURE__*/ queueTask(queueDomReads);
 const writeTask = /*@__PURE__*/ queueTask(queueDomWrites);
-
-const Build = {
-    isDev: BUILD.isDev ? true : false,
-    isBrowser: true
-};
 
 /**
  * Default style mode id
@@ -156,10 +129,6 @@ const Build = {
  * Don't add values to these!!
  */
 const EMPTY_OBJ = {};
-/**
- * Namespaces
- */
-const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const isDef = (v) => v != null;
 const toLowerCase = (str) => str.toLowerCase();
@@ -173,13 +142,13 @@ const patchEsm = () => {
     // @ts-ignore
     if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
         // @ts-ignore
-        return __sc_import_core_documentation('./css-shim-f7ddb189-f7ddb189.js');
+        return Promise.resolve(require('./css-shim-f7ddb189-673dd43d.js'));
     }
     return Promise.resolve();
 };
 const patchBrowser = async () => {
     // @ts-ignore
-    const importMeta = "";
+    const importMeta = (typeof document === 'undefined' ? new (require('u' + 'rl').URL)('file:' + __filename).href : (document.currentScript && document.currentScript.src || new URL('chunk-4055d79b.js', document.baseURI).href));
     if (importMeta !== '') {
         return Promise.resolve(new URL('.', importMeta).href);
     }
@@ -190,7 +159,7 @@ const patchBrowser = async () => {
         patchDynamicImport(resourcesUrl.href);
         if (!window.customElements) {
             // @ts-ignore
-            await __sc_import_core_documentation('./dom-a0c82e31-a0c82e31.js');
+            await Promise.resolve(require('./dom-a0c82e31-d4621515.js'));
         }
         return resourcesUrl.href;
     }
@@ -222,15 +191,7 @@ const patchDynamicImport = (base) => {
         };
     }
 };
-
-const CONTENT_REF_ID = 'r';
-const ORG_LOCATION_ID = 'o';
-const SLOT_NODE_ID = 's';
-const TEXT_NODE_ID = 't';
 const HYDRATED_CLASS = 'hydrated';
-const HYDRATE_ID = 's-id';
-const HYDRATE_CHILD_ID = 'c-id';
-const XLINK_NS = 'http://www.w3.org/1999/xlink';
 
 const rootAppliedStyles = new WeakMap();
 const registerStyle = (scopeId, cssText, allowCS) => {
@@ -245,15 +206,11 @@ const registerStyle = (scopeId, cssText, allowCS) => {
     styles.set(scopeId, style);
 };
 const addStyle = (styleContainerNode, tagName, mode, hostElm) => {
-    let scopeId = getScopeId(tagName, mode);
+    let scopeId = getScopeId(tagName);
     let style = styles.get(scopeId);
     // if an element is NOT connected then getRootNode() will return the wrong root node
     // so the fallback is to always use the document for the root node in those cases
     styleContainerNode = (styleContainerNode.nodeType === 11 /* DocumentFragment */ ? styleContainerNode : doc);
-    if (BUILD.mode && !style) {
-        scopeId = getScopeId(tagName);
-        style = styles.get(scopeId);
-    }
     if (style) {
         if (typeof style === 'string') {
             styleContainerNode = styleContainerNode.head || styleContainerNode;
@@ -263,11 +220,7 @@ const addStyle = (styleContainerNode, tagName, mode, hostElm) => {
                 rootAppliedStyles.set(styleContainerNode, appliedStyles = new Set());
             }
             if (!appliedStyles.has(scopeId)) {
-                if (BUILD.hydrateClientSide && styleContainerNode.host && (styleElm = styleContainerNode.firstElementChild) && styleElm.tagName === 'STYLE') {
-                    // This is only happening on native shadow-dom, do not needs CSS var shim
-                    styleElm.innerHTML = style;
-                }
-                else {
+                {
                     if (cssVarShim) {
                         styleElm = cssVarShim.createHostStyle(hostElm, scopeId, style);
                         const newScopeId = styleElm['s-sc'];
@@ -283,9 +236,6 @@ const addStyle = (styleContainerNode, tagName, mode, hostElm) => {
                         styleElm = doc.createElement('style');
                         styleElm.innerHTML = style;
                     }
-                    if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
-                        styleElm.setAttribute(HYDRATE_ID, scopeId);
-                    }
                     styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
                 }
                 if (appliedStyles) {
@@ -293,7 +243,7 @@ const addStyle = (styleContainerNode, tagName, mode, hostElm) => {
                 }
             }
         }
-        else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
+        else if (!styleContainerNode.adoptedStyleSheets.includes(style)) {
             styleContainerNode.adoptedStyleSheets = [
                 ...styleContainerNode.adoptedStyleSheets,
                 style
@@ -303,10 +253,10 @@ const addStyle = (styleContainerNode, tagName, mode, hostElm) => {
     return scopeId;
 };
 const attachStyles = (elm, cmpMeta, mode) => {
-    const styleId = addStyle((BUILD.shadowDom && supportsShadowDom && elm.shadowRoot)
+    const styleId = addStyle((supportsShadowDom && elm.shadowRoot)
         ? elm.shadowRoot
         : elm.getRootNode(), cmpMeta.$tagName$, mode, elm);
-    if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && cmpMeta.$flags$ & 10 /* needsScopedEncapsulation */) {
+    if (cmpMeta.$flags$ & 10 /* needsScopedEncapsulation */) {
         // only required when we're NOT using native shadow dom (slot)
         // or this browser doesn't support native shadow dom
         // and this host element was NOT created with SSR
@@ -316,13 +266,9 @@ const attachStyles = (elm, cmpMeta, mode) => {
         // DOM WRITE!!
         elm['s-sc'] = styleId;
         elm.classList.add(styleId + '-h');
-        if (BUILD.scoped && cmpMeta.$flags$ & 2 /* scopedCssEncapsulation */) {
-            elm.classList.add(styleId + '-s');
-        }
     }
 };
-const getScopeId = (tagName, mode) => 'sc-' + ((BUILD.mode && mode) ? tagName + '-' + mode : tagName);
-const convertScopedToShadow = (css) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
+const getScopeId = (tagName, mode) => 'sc-' + (tagName);
 
 /**
  * Production h() function based on Preact by
@@ -365,15 +311,15 @@ const h = (nodeName, vnodeData, ...children) => {
         }
     };
     walk(children);
-    if (BUILD.vdomAttribute && vnodeData) {
+    if (vnodeData) {
         // normalize class / classname attributes
-        if (BUILD.vdomKey) {
+        {
             key = vnodeData.key || undefined;
         }
-        if (BUILD.slotRelocation) {
+        {
             slotName = vnodeData.name;
         }
-        if (BUILD.vdomClass) {
+        {
             const classData = vnodeData.className || vnodeData.class;
             if (classData) {
                 vnodeData.class = typeof classData !== 'object'
@@ -384,7 +330,7 @@ const h = (nodeName, vnodeData, ...children) => {
             }
         }
     }
-    if (BUILD.vdomFunctional && typeof nodeName === 'function') {
+    if (typeof nodeName === 'function') {
         // nodeName is a functional component
         return nodeName(vnodeData, vNodeChildren, vdomFnUtils);
     }
@@ -395,10 +341,10 @@ const h = (nodeName, vnodeData, ...children) => {
         $elm$: undefined,
         $attrs$: vnodeData,
     };
-    if (BUILD.vdomKey) {
+    {
         vnode.$key$ = key;
     }
-    if (BUILD.slotRelocation) {
+    {
         vnode.$name$ = slotName;
     }
     return vnode;
@@ -442,23 +388,20 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
     if (oldValue === newValue) {
         return;
     }
-    if (BUILD.vdomClass && memberName === 'class' && !isSvg) {
+    if (memberName === 'class' && !isSvg) {
         // Class
-        if (BUILD.updatable) {
+        {
             const oldList = parseClassList(oldValue);
             const baseList = parseClassList(elm.className).filter(item => !oldList.includes(item));
             elm.className = baseList.concat(parseClassList(newValue).filter(item => !baseList.includes(item))).join(' ');
         }
-        else {
-            elm.className = newValue;
-        }
     }
-    else if (BUILD.vdomStyle && memberName === 'style') {
+    else if (memberName === 'style') {
         // update style attribute, css properties and values
-        if (BUILD.updatable) {
+        {
             for (const prop in oldValue) {
                 if (!newValue || newValue[prop] == null) {
-                    if (!BUILD.hydrateServerSide && prop.includes('-')) {
+                    if (prop.includes('-')) {
                         elm.style.removeProperty(prop);
                     }
                     else {
@@ -469,7 +412,7 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
         }
         for (const prop in newValue) {
             if (!oldValue || newValue[prop] !== oldValue[prop]) {
-                if (!BUILD.hydrateServerSide && prop.includes('-')) {
+                if (prop.includes('-')) {
                     elm.style.setProperty(prop, newValue[prop]);
                 }
                 else {
@@ -478,14 +421,14 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
             }
         }
     }
-    else if (BUILD.vdomKey && memberName === 'key') ;
-    else if (BUILD.vdomRef && memberName === 'ref') {
+    else if (memberName === 'key') ;
+    else if (memberName === 'ref') {
         // minifier will clean this up
         if (newValue) {
             newValue(elm);
         }
     }
-    else if (BUILD.vdomListener && memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
+    else if (memberName.startsWith('on') && !isMemberInElement(elm, memberName)) {
         // Event Handlers
         // so if the member name starts with "on" and the 3rd characters is
         // a capital letter, and it's not already a member on the element,
@@ -522,28 +465,14 @@ const setAccessor = (elm, memberName, oldValue, newValue, isSvg, flags) => {
             }
             catch (e) { }
         }
-        /**
-         * Need to manually update attribute if:
-         * - memberName is not an attribute
-         * - if we are rendering the host element in order to reflect attribute
-         * - if it's a SVG, since properties might not work in <svg>
-         * - if the newValue is null/undefined or 'false'.
-         */
-        const isXlinkNs = BUILD.svg && isSvg && (memberName !== (memberName = memberName.replace(/^xlink\:?/, ''))) ? true : false;
         if (newValue == null || newValue === false) {
-            if (isXlinkNs) {
-                elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
-            }
-            else {
+            {
                 elm.removeAttribute(memberName);
             }
         }
         else if ((!isProp || (flags & 4 /* isHost */) || isSvg) && !isComplex) {
             newValue = newValue === true ? '' : newValue.toString();
-            if (isXlinkNs) {
-                elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
-            }
-            else {
+            {
                 elm.setAttribute(memberName, newValue);
             }
         }
@@ -558,7 +487,7 @@ const updateElement = (oldVnode, newVnode, isSvgMode, memberName) => {
     const elm = (newVnode.$elm$.nodeType === 11 /* DocumentFragment */ && newVnode.$elm$.host) ? newVnode.$elm$.host : newVnode.$elm$;
     const oldVnodeAttrs = (oldVnode && oldVnode.$attrs$) || EMPTY_OBJ;
     const newVnodeAttrs = newVnode.$attrs$ || EMPTY_OBJ;
-    if (BUILD.updatable) {
+    {
         // remove attributes no longer present on the vnode by setting them to undefined
         for (memberName in oldVnodeAttrs) {
             if (newVnodeAttrs[memberName] == null && oldVnodeAttrs[memberName] != null) {
@@ -586,7 +515,7 @@ const createElm = (oldParentVNode, newParentVNode, childIndex, parentElm) => {
     let elm;
     let childNode;
     let oldVNode;
-    if (BUILD.slotRelocation && !useNativeShadowDom) {
+    if (!useNativeShadowDom) {
         // remember for later we need to check to relocate nodes
         checkSlotRelocate = true;
         if (newVNode.$tag$ === 'slot') {
@@ -607,30 +536,22 @@ const createElm = (oldParentVNode, newParentVNode, childIndex, parentElm) => {
             }
         }
     }
-    if (BUILD.isDev && newVNode.$elm$) {
-        consoleError(`The JSX ${isDef(newVNode.$text$) ? `"${newVNode.$text$}" text` : `"${newVNode.$tag$}" element`} node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`);
-    }
     if (isDef(newVNode.$text$)) {
         // create text node
         newVNode.$elm$ = doc.createTextNode(newVNode.$text$);
     }
-    else if (BUILD.slotRelocation && newVNode.$flags$ & 1 /* isSlotReference */) {
+    else if (newVNode.$flags$ & 1 /* isSlotReference */) {
         // create a slot reference node
-        newVNode.$elm$ = (BUILD.isDebug || BUILD.hydrateServerSide) ? doc.createComment(`slot-reference:${hostTagName}`) : doc.createTextNode('');
+        newVNode.$elm$ = doc.createTextNode('');
     }
     else {
         // create element
-        elm = newVNode.$elm$ = ((BUILD.svg && (isSvgMode || newVNode.$tag$ === 'svg'))
-            ? doc.createElementNS(SVG_NS, newVNode.$tag$)
-            : doc.createElement((BUILD.slotRelocation && newVNode.$flags$ & 2 /* isSlotFallback */) ? 'slot-fb' : newVNode.$tag$));
-        if (BUILD.svg) {
-            isSvgMode = newVNode.$tag$ === 'svg' ? true : (newVNode.$tag$ === 'foreignObject' ? false : isSvgMode);
-        }
+        elm = newVNode.$elm$ = (doc.createElement((newVNode.$flags$ & 2 /* isSlotFallback */) ? 'slot-fb' : newVNode.$tag$));
         // add css classes, attrs, props, listeners, etc.
-        if (BUILD.vdomAttribute) {
+        {
             updateElement(null, newVNode, isSvgMode);
         }
-        if ((BUILD.shadowDom || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
+        if (isDef(scopeId) && elm['s-si'] !== scopeId) {
             // if there is a scopeId and this is the initial render
             // then let's add the scopeId as a css class
             elm.classList.add((elm['s-si'] = scopeId));
@@ -646,12 +567,8 @@ const createElm = (oldParentVNode, newParentVNode, childIndex, parentElm) => {
                 }
             }
         }
-        if (BUILD.svg && newVNode.$tag$ === 'svg') {
-            // Only reset the SVG context when we're exiting SVG element
-            isSvgMode = false;
-        }
     }
-    if (BUILD.slotRelocation) {
+    {
         newVNode.$elm$['s-hn'] = hostTagName;
         if (newVNode.$flags$ & (2 /* isSlotFallback */ | 1 /* isSlotReference */)) {
             // remember the content reference comment
@@ -696,9 +613,9 @@ const putBackInOriginalLocation = (parentElm, recursive) => {
     plt.$flags$ &= ~1 /* isTmpDisconnected */;
 };
 const addVnodes = (parentElm, before, parentVNode, vnodes, startIdx, endIdx) => {
-    let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm);
+    let containerElm = ((parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm);
     let childNode;
-    if (BUILD.shadowDom && containerElm.shadowRoot && toLowerCase(containerElm.tagName) === hostTagName) {
+    if (containerElm.shadowRoot && toLowerCase(containerElm.tagName) === hostTagName) {
         containerElm = containerElm.shadowRoot;
     }
     for (; startIdx <= endIdx; ++startIdx) {
@@ -706,7 +623,7 @@ const addVnodes = (parentElm, before, parentVNode, vnodes, startIdx, endIdx) => 
             childNode = createElm(null, parentVNode, startIdx, parentElm);
             if (childNode) {
                 vnodes[startIdx].$elm$ = childNode;
-                containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
+                containerElm.insertBefore(childNode, referenceNode(before));
             }
         }
     }
@@ -716,7 +633,7 @@ const removeVnodes = (vnodes, startIdx, endIdx, elm) => {
         if (isDef(vnodes[startIdx])) {
             elm = vnodes[startIdx].$elm$;
             callNodeRefs(vnodes[startIdx], true);
-            if (BUILD.slotRelocation) {
+            {
                 // we're removing this element
                 // so it's possible we need to show slot fallback content now
                 checkSlotFallbackVisibility = true;
@@ -774,7 +691,7 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
         }
         else if (isSameVnode(oldStartVnode, newEndVnode)) {
             // Vnode moved right
-            if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
+            if (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot') {
                 putBackInOriginalLocation(oldStartVnode.$elm$.parentNode, false);
             }
             patch(oldStartVnode, newEndVnode);
@@ -784,7 +701,7 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
         }
         else if (isSameVnode(oldEndVnode, newStartVnode)) {
             // Vnode moved left
-            if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
+            if (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot') {
                 putBackInOriginalLocation(oldEndVnode.$elm$.parentNode, false);
             }
             patch(oldEndVnode, newStartVnode);
@@ -795,7 +712,7 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
         else {
             // createKeyToOldIdx
             idxInOld = -1;
-            if (BUILD.vdomKey) {
+            {
                 for (i = oldStartIdx; i <= oldEndIdx; ++i) {
                     if (oldCh[i] && isDef(oldCh[i].$key$) && oldCh[i].$key$ === newStartVnode.$key$) {
                         idxInOld = i;
@@ -803,7 +720,7 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
                     }
                 }
             }
-            if (BUILD.vdomKey && idxInOld >= 0) {
+            if (idxInOld >= 0) {
                 elmToMove = oldCh[idxInOld];
                 if (elmToMove.$tag$ !== newStartVnode.$tag$) {
                     node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
@@ -821,11 +738,8 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
                 newStartVnode = newCh[++newStartIdx];
             }
             if (node) {
-                if (BUILD.slotRelocation) {
+                {
                     parentReferenceNode(oldStartVnode.$elm$).insertBefore(node, referenceNode(oldStartVnode.$elm$));
-                }
-                else {
-                    oldStartVnode.$elm$.parentNode.insertBefore(node, oldStartVnode.$elm$);
                 }
             }
         }
@@ -833,7 +747,7 @@ const updateChildren = (parentElm, oldCh, newVNode, newCh) => {
     if (oldStartIdx > oldEndIdx) {
         addVnodes(parentElm, (newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].$elm$), newVNode, newCh, newStartIdx, newEndIdx);
     }
-    else if (BUILD.updatable && newStartIdx > newEndIdx) {
+    else if (newStartIdx > newEndIdx) {
         removeVnodes(oldCh, oldStartIdx, oldEndIdx);
     }
 };
@@ -841,10 +755,10 @@ const isSameVnode = (vnode1, vnode2) => {
     // compare if two vnode to see if they're "technically" the same
     // need to have the same element tag, and same key to be the same
     if (vnode1.$tag$ === vnode2.$tag$) {
-        if (BUILD.slotRelocation && vnode1.$tag$ === 'slot') {
+        if (vnode1.$tag$ === 'slot') {
             return vnode1.$name$ === vnode2.$name$;
         }
-        if (BUILD.vdomKey) {
+        {
             return vnode1.$key$ === vnode2.$key$;
         }
         return true;
@@ -864,18 +778,10 @@ const patch = (oldVNode, newVNode) => {
     const oldChildren = oldVNode.$children$;
     const newChildren = newVNode.$children$;
     let defaultHolder;
-    if (BUILD.svg) {
-        // test if we're rendering an svg element, or still rendering nodes inside of one
-        // only add this to the when the compiler sees we're using an svg somewhere
-        isSvgMode = elm &&
-            isDef(elm.parentNode) &&
-            elm.ownerSVGElement !== undefined;
-        isSvgMode = newVNode.$tag$ === 'svg' ? true : (newVNode.$tag$ === 'foreignObject' ? false : isSvgMode);
-    }
     if (!isDef(newVNode.$text$)) {
         // element node
-        if (BUILD.vdomAttribute) {
-            if (BUILD.slot && newVNode.$tag$ === 'slot') ;
+        {
+            if (newVNode.$tag$ === 'slot') ;
             else {
                 // either this is the first render of an element OR it's an update
                 // AND we already know it's possible it could have changed
@@ -883,35 +789,32 @@ const patch = (oldVNode, newVNode) => {
                 updateElement(oldVNode, newVNode, isSvgMode);
             }
         }
-        if (BUILD.updatable && isDef(oldChildren) && isDef(newChildren)) {
+        if (isDef(oldChildren) && isDef(newChildren)) {
             // looks like there's child vnodes for both the old and new vnodes
             updateChildren(elm, oldChildren, newVNode, newChildren);
         }
         else if (isDef(newChildren)) {
             // no old child vnodes, but there are new child vnodes to add
-            if (BUILD.updatable && BUILD.vdomText && isDef(oldVNode.$text$)) {
+            if (isDef(oldVNode.$text$)) {
                 // the old vnode was text, so be sure to clear it out
                 elm.textContent = '';
             }
             // add the new vnode children
             addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
         }
-        else if (BUILD.updatable && isDef(oldChildren)) {
+        else if (isDef(oldChildren)) {
             // no new child vnodes, but there are old child vnodes to remove
             removeVnodes(oldChildren, 0, oldChildren.length - 1);
         }
     }
-    else if (BUILD.vdomText && BUILD.slotRelocation && (defaultHolder = elm['s-cr'])) {
+    else if (defaultHolder = elm['s-cr']) {
         // this element has slotted content
         defaultHolder.parentNode.textContent = newVNode.$text$;
     }
-    else if (BUILD.vdomText && oldVNode.$text$ !== newVNode.$text$) {
+    else if (oldVNode.$text$ !== newVNode.$text$) {
         // update the text content for the text only vnode
         // and also only if the text is different than before
         elm.textContent = newVNode.$text$;
-    }
-    if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'svg') {
-        isSvgMode = false;
     }
 };
 const updateFallbackSlotVisibility = (elm, childNode, childNodes, i, ilen, j, slotNameAttr, nodeType) => {
@@ -1006,7 +909,7 @@ const relocateSlotContent = (elm) => {
     }
 };
 const callNodeRefs = (vNode, isDestroy) => {
-    if (BUILD.vdomRef && vNode) {
+    if (vNode) {
         vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(isDestroy ? null : vNode.$elm$);
         vNode.$children$ && vNode.$children$.forEach(vChild => {
             callNodeRefs(vChild, isDestroy);
@@ -1025,17 +928,13 @@ const renderVdom = (hostElm, hostRef, cmpMeta, renderFnResults) => {
     else {
         renderFnResults = h(null, null, renderFnResults);
     }
-    if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
-        renderFnResults.$attrs$ = renderFnResults.$attrs$ || {};
-        cmpMeta.$attrsToReflect$.forEach(([propName, attribute]) => renderFnResults.$attrs$[attribute] = hostElm[propName]);
-    }
     renderFnResults.$flags$ |= 4 /* isHost */;
     hostRef.$vnode$ = renderFnResults;
-    renderFnResults.$elm$ = oldVNode.$elm$ = (BUILD.shadowDom ? hostElm.shadowRoot || hostElm : hostElm);
-    if (BUILD.scoped || BUILD.shadowDom) {
+    renderFnResults.$elm$ = oldVNode.$elm$ = (hostElm.shadowRoot || hostElm);
+    {
         scopeId = hostElm['s-sc'];
     }
-    if (BUILD.slotRelocation) {
+    {
         contentRef = hostElm['s-cr'];
         useNativeShadowDom = supportsShadowDom && (cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) !== 0;
         // always reset
@@ -1043,7 +942,7 @@ const renderVdom = (hostElm, hostRef, cmpMeta, renderFnResults) => {
     }
     // synchronous patch
     patch(oldVNode, renderFnResults);
-    if (BUILD.slotRelocation) {
+    {
         if (checkSlotRelocate) {
             relocateSlotContent(renderFnResults.$elm$);
             for (let i = 0; i < relocateNodes.length; i++) {
@@ -1051,9 +950,7 @@ const renderVdom = (hostElm, hostRef, cmpMeta, renderFnResults) => {
                 if (!relocateNode.nodeToRelocate['s-ol']) {
                     // add a reference node marking this node's original location
                     // keep a reference to this node for later lookups
-                    const orgLocationNode = (BUILD.isDebug || BUILD.hydrateServerSide)
-                        ? doc.createComment(`org-loc`)
-                        : doc.createTextNode('');
+                    const orgLocationNode = doc.createTextNode('');
                     orgLocationNode['s-nr'] = relocateNode.nodeToRelocate;
                     relocateNode.nodeToRelocate.parentNode.insertBefore((relocateNode.nodeToRelocate['s-ol'] = orgLocationNode), relocateNode.nodeToRelocate);
                 }
@@ -1115,51 +1012,31 @@ const safeCall = async (instance, method) => {
     }
 };
 const scheduleUpdate = async (elm, hostRef, cmpMeta, isInitialLoad) => {
-    if (BUILD.taskQueue && BUILD.updatable) {
+    {
         hostRef.$flags$ |= 16 /* isQueuedForUpdate */;
     }
-    const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
-    if (isInitialLoad) {
-        emitLifecycleEvent(elm, 'componentWillLoad');
-        if (BUILD.cmpWillLoad) {
-            await safeCall(instance, 'componentWillLoad');
-        }
-    }
-    else {
-        emitLifecycleEvent(elm, 'componentWillUpdate');
-        if (BUILD.cmpWillUpdate) {
-            await safeCall(instance, 'componentWillUpdate');
-        }
-    }
-    emitLifecycleEvent(elm, 'componentWillRender');
-    if (BUILD.cmpWillRender) {
-        await safeCall(instance, 'componentWillRender');
-    }
+    const instance = hostRef.$lazyInstance$;
     // there is no ancestorc omponent or the ancestor component
     // has already fired off its lifecycle update then
     // fire off the initial update
-    if (BUILD.taskQueue) {
+    {
         writeTask(() => updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad));
-    }
-    else {
-        // syncronuously write DOM
-        updateComponent(elm, hostRef, cmpMeta, instance, isInitialLoad);
     }
 };
 const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
     // updateComponent
-    if (BUILD.updatable && BUILD.taskQueue) {
+    {
         hostRef.$flags$ &= ~16 /* isQueuedForUpdate */;
     }
-    if (BUILD.lifecycle && BUILD.lazyLoad) {
+    {
         elm['s-lr'] = false;
     }
-    if (BUILD.style && isInitialLoad) {
+    if (isInitialLoad) {
         // DOM WRITE!
         attachStyles(elm, cmpMeta, hostRef.$modeName$);
     }
-    if (BUILD.hasRenderFn || BUILD.reflect) {
-        if (BUILD.vdomRender || BUILD.reflect) {
+    {
+        {
             // tell the platform we're actively rendering
             // if a value is changed within a render() then
             // this tells the platform not to queue the change
@@ -1168,41 +1045,25 @@ const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
                 // looks like we've got child nodes to render into this host element
                 // or we need to update the css class/attrs on the host element
                 // DOM WRITE!
-                renderVdom(elm, hostRef, cmpMeta, (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render()));
+                renderVdom(elm, hostRef, cmpMeta, instance.render());
             }
             catch (e) {
                 consoleError(e);
             }
             hostRef.$flags$ &= ~4 /* isActiveRender */;
         }
-        else {
-            elm.textContent = (BUILD.allRenderFn) ? instance.render() : (instance.render && instance.render());
-        }
     }
     if (cssVarShim) {
         cssVarShim.updateHost(elm);
     }
-    if (BUILD.hydrateServerSide) {
-        try {
-            // manually connected child components during server-side hydrate
-            serverSideConnected(elm);
-            if (isInitialLoad && (cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */)) {
-                // using only during server-side hydrate
-                elm['s-sd'] = true;
-            }
-        }
-        catch (e) {
-            consoleError(e);
-        }
-    }
     // set that this component lifecycle rendering has completed
-    if (BUILD.lifecycle && BUILD.lazyLoad) {
+    {
         elm['s-lr'] = true;
     }
-    if (BUILD.updatable || BUILD.lazyLoad) {
+    {
         hostRef.$flags$ |= 2 /* hasRendered */;
     }
-    if (BUILD.lifecycle && BUILD.lazyLoad && elm['s-rc'].length > 0) {
+    if (elm['s-rc'].length > 0) {
         // ok, so turns out there are some child host elements
         // waiting on this parent element to load
         // let's fire off all update callbacks waiting
@@ -1212,53 +1073,34 @@ const updateComponent = (elm, hostRef, cmpMeta, instance, isInitialLoad) => {
     postUpdateComponent(elm, hostRef);
 };
 const postUpdateComponent = (elm, hostRef, ancestorsActivelyLoadingChildren) => {
-    if ((BUILD.lazyLoad || BUILD.lifecycle || BUILD.lifecycleDOMEvents) && !elm['s-al']) {
-        const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
+    if (!elm['s-al']) {
+        const instance = hostRef.$lazyInstance$;
         const ancestorComponent = hostRef.$ancestorComponent$;
-        if (BUILD.cmpDidRender) {
-            safeCall(instance, 'componentDidRender');
-        }
-        emitLifecycleEvent(elm, 'componentDidRender');
         if (!(hostRef.$flags$ & 512 /* hasLoadedComponent */)) {
             hostRef.$flags$ |= 512 /* hasLoadedComponent */;
-            if (BUILD.lazyLoad && BUILD.cssAnnotations) {
+            {
                 // DOM WRITE!
                 // add the css class that this element has officially hydrated
                 elm.classList.add(HYDRATED_CLASS);
             }
-            if (BUILD.cmpDidLoad) {
+            {
                 safeCall(instance, 'componentDidLoad');
             }
-            emitLifecycleEvent(elm, 'componentDidLoad');
-            if (BUILD.lazyLoad) {
+            {
                 hostRef.$onReadyResolve$(elm);
             }
-            if (BUILD.lazyLoad && !ancestorComponent) {
+            if (!ancestorComponent) {
                 // on appload
                 // we have finish the first big initial render
                 doc.documentElement.classList.add(HYDRATED_CLASS);
-                if (!BUILD.hydrateServerSide) {
+                {
                     setTimeout(() => plt.$flags$ |= 2 /* appLoaded */, 999);
                 }
-                emitLifecycleEvent(elm, 'appload');
             }
-        }
-        else {
-            if (BUILD.cmpDidUpdate) {
-                // we've already loaded this component
-                // fire off the user's componentDidUpdate method (if one was provided)
-                // componentDidUpdate runs AFTER render() has been called
-                // and all child components have finished updating
-                safeCall(instance, 'componentDidUpdate');
-            }
-            emitLifecycleEvent(elm, 'componentDidUpdate');
-        }
-        if (BUILD.hotModuleReplacement) {
-            elm['s-hmr-load'] && elm['s-hmr-load']();
         }
         // load events fire from bottom to top
         // the deepest elements load first then bubbles up
-        if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent) {
+        if (ancestorComponent) {
             // ok so this element already has a known ancestor component
             // let's make sure we remove this element from its ancestor's
             // known list of child elements which are actively loading
@@ -1281,60 +1123,22 @@ const postUpdateComponent = (elm, hostRef, ancestorsActivelyLoadingChildren) => 
         // (⌐■_■)
     }
 };
-const emitLifecycleEvent = (elm, lifecycleName) => {
-    if (BUILD.lifecycleDOMEvents) {
-        elm.dispatchEvent(new CustomEvent('stencil_' + lifecycleName, { 'bubbles': true, 'composed': true }));
-    }
-};
-const serverSideConnected = (elm) => {
-    const children = elm.children;
-    if (children != null) {
-        for (let i = 0, ii = children.length; i < ii; i++) {
-            const childElm = children[i];
-            if (typeof childElm.connectedCallback === 'function') {
-                childElm.connectedCallback();
-            }
-            serverSideConnected(childElm);
-        }
-    }
-};
 
 const disconnectedCallback = (elm) => {
     if ((plt.$flags$ & 1 /* isTmpDisconnected */) === 0) {
         const hostRef = getHostRef(elm);
-        if (BUILD.hostListener) {
-            if (hostRef.$rmListeners$) {
-                hostRef.$rmListeners$();
-                hostRef.$rmListeners$ = undefined;
-            }
-        }
         // clear CSS var-shim tracking
         if (cssVarShim) {
             cssVarShim.removeHost(elm);
         }
-        const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
-        if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
-            safeCall(instance, 'disconnectedCallback');
-        }
-        if (BUILD.cmpDidUnload) {
-            safeCall(instance, 'componentDidUnload');
-        }
+        const instance = hostRef.$lazyInstance$;
     }
 };
 
 const parsePropertyValue = (propValue, propType) => {
     // ensure this value is of the correct prop type
     if (propValue != null && !isComplexType(propValue)) {
-        if (BUILD.propBoolean && propType & 4 /* Boolean */) {
-            // per the HTML spec, any string value means it is a boolean true value
-            // but we'll cheat here and say that the string "false" is the boolean false
-            return (propValue === 'false' ? false : propValue === '' || !!propValue);
-        }
-        if (BUILD.propNumber && propType & 2 /* Number */) {
-            // force it to be a number
-            return parseFloat(propValue);
-        }
-        if (BUILD.propString && propType & 1 /* String */) {
+        if (propType & 1 /* String */) {
             // could have been passed as a number or boolean
             // but we still want it as a string
             return String(propValue);
@@ -1351,33 +1155,16 @@ const getValue = (ref, propName) => getHostRef(ref).$instanceValues$.get(propNam
 const setValue = (ref, propName, newVal, cmpMeta) => {
     // check our new property value against our internal value
     const hostRef = getHostRef(ref);
-    const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : ref;
+    const elm = hostRef.$hostElement$;
     const oldVal = hostRef.$instanceValues$.get(propName);
     const flags = hostRef.$flags$;
     newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
-    if (newVal !== oldVal && (!BUILD.lazyLoad || !(flags & 8 /* isConstructingInstance */) || oldVal === undefined)) {
+    if (newVal !== oldVal && (!(flags & 8 /* isConstructingInstance */) || oldVal === undefined)) {
         // gadzooks! the property's value has changed!!
         // set our new value!
         hostRef.$instanceValues$.set(propName, newVal);
-        if (!BUILD.lazyLoad || hostRef.$lazyInstance$) {
-            // get an array of method names of watch functions to call
-            if (BUILD.watchCallback && cmpMeta.$watchers$ &&
-                (flags & (1 /* hasConnected */ | 8 /* isConstructingInstance */)) === 1 /* hasConnected */) {
-                const watchMethods = cmpMeta.$watchers$[propName];
-                if (watchMethods) {
-                    // this instance is watching for when this property changed
-                    watchMethods.forEach(watchMethodName => {
-                        try {
-                            // fire off each of the watch methods that are watching this property
-                            (BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm)[watchMethodName].call((BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm), newVal, oldVal, propName);
-                        }
-                        catch (e) {
-                            consoleError(e);
-                        }
-                    });
-                }
-            }
-            if (BUILD.updatable && (flags & (4 /* isActiveRender */ | 2 /* hasRendered */ | 16 /* isQueuedForUpdate */)) === 2 /* hasRendered */) {
+        if (hostRef.$lazyInstance$) {
+            if ((flags & (4 /* isActiveRender */ | 2 /* hasRendered */ | 16 /* isQueuedForUpdate */)) === 2 /* hasRendered */) {
                 // looks like this value actually changed, so we've got work to do!
                 // but only if we've already rendered, otherwise just chill out
                 // queue that we need to do an update, but don't worry about queuing
@@ -1389,17 +1176,14 @@ const setValue = (ref, propName, newVal, cmpMeta) => {
 };
 
 const proxyComponent = (Cstr, cmpMeta, flags) => {
-    if (BUILD.member && cmpMeta.$members$) {
-        if (BUILD.watchCallback && Cstr.watchers) {
-            cmpMeta.$watchers$ = Cstr.watchers;
-        }
+    if (cmpMeta.$members$) {
         // It's better to have a const than two Object.entries()
         const members = Object.entries(cmpMeta.$members$);
         const prototype = Cstr.prototype;
         members.forEach(([memberName, [memberFlags]]) => {
-            if ((BUILD.prop || BUILD.state) && ((memberFlags & 31 /* Prop */) ||
-                ((!BUILD.lazyLoad || flags & 2 /* proxyState */) &&
-                    (memberFlags & 32 /* State */)))) {
+            if ((memberFlags & 31 /* Prop */) ||
+                ((flags & 2 /* proxyState */) &&
+                    (memberFlags & 32 /* State */))) {
                 // proxyComponent - prop
                 Object.defineProperty(prototype, memberName, {
                     get() {
@@ -1414,7 +1198,7 @@ const proxyComponent = (Cstr, cmpMeta, flags) => {
                     enumerable: true
                 });
             }
-            else if (BUILD.lazyLoad && BUILD.method && (flags & 1 /* isElementConstructor */) && (memberFlags & 64 /* Method */)) {
+            else if (flags & 1 && (memberFlags & 64 /* Method */)) {
                 // proxyComponent - method
                 Object.defineProperty(prototype, memberName, {
                     value(...args) {
@@ -1424,7 +1208,7 @@ const proxyComponent = (Cstr, cmpMeta, flags) => {
                 });
             }
         });
-        if (BUILD.observeAttribute && (!BUILD.lazyLoad || flags & 1 /* isElementConstructor */)) {
+        if (flags & 1) {
             const attrNameToPropName = new Map();
             prototype.attributeChangedCallback = function (attrName, _oldValue, newValue) {
                 const propName = attrNameToPropName.get(attrName);
@@ -1439,9 +1223,6 @@ const proxyComponent = (Cstr, cmpMeta, flags) => {
                 .map(([propName, m]) => {
                 const attrName = m[1] || propName;
                 attrNameToPropName.set(attrName, propName);
-                if (BUILD.reflect && m[0] & 512 /* ReflectAttr */) {
-                    cmpMeta.$attrsToReflect$.push([propName, attrName]);
-                }
                 return attrName;
             });
         }
@@ -1449,290 +1230,24 @@ const proxyComponent = (Cstr, cmpMeta, flags) => {
     return Cstr;
 };
 
-const addEventListeners = (elm, hostRef, listeners) => {
-    const removeFns = listeners.map(([flags, name, method]) => {
-        const target = (BUILD.hostListenerTarget ? getHostListenerTarget(elm, flags) : elm);
-        const handler = hostListenerProxy(hostRef, method);
-        const opts = hostListenerOpts(flags);
-        plt.ael(target, name, handler, opts);
-        return () => plt.rel(target, name, handler, opts);
-    });
-    return () => removeFns.forEach(fn => fn());
-};
-const hostListenerProxy = (hostRef, methodName) => {
-    return (ev) => {
-        if (BUILD.lazyLoad) {
-            if (hostRef.$lazyInstance$) {
-                // instance is ready, let's call it's member method for this event
-                return hostRef.$lazyInstance$[methodName](ev);
-            }
-            else {
-                return hostRef.$onReadyPromise$.then(() => hostRef.$lazyInstance$[methodName](ev)).catch(consoleError);
-            }
-        }
-        else {
-            return hostRef.$hostElement$[methodName](ev);
-        }
-    };
-};
-const getHostListenerTarget = (elm, flags) => {
-    if (BUILD.hostListenerTargetDocument && flags & 4 /* TargetDocument */)
-        return doc;
-    if (BUILD.hostListenerTargetWindow && flags & 8 /* TargetWindow */)
-        return win;
-    if (BUILD.hostListenerTargetBody && flags & 32 /* TargetBody */)
-        return doc.body;
-    if (BUILD.hostListenerTargetParent && flags & 16 /* TargetParent */)
-        return elm.parentElement;
-    return elm;
-};
-const hostListenerOpts = (flags) => supportsListenerOptions ?
-    {
-        'passive': (flags & 1 /* Passive */) !== 0,
-        'capture': (flags & 2 /* Capture */) !== 0,
-    }
-    : (flags & 2 /* Capture */) !== 0;
-
-const initializeClientHydrate = (hostElm, tagName, hostId, hostRef) => {
-    const shadowRoot = hostElm.shadowRoot;
-    const childRenderNodes = [];
-    const slotNodes = [];
-    const shadowRootNodes = (BUILD.shadowDom && shadowRoot ? [] : null);
-    const vnode = hostRef.$vnode$ = {
-        $flags$: 0,
-        $tag$: tagName
-    };
-    if (!plt.$orgLocNodes$) {
-        initializeDocumentHydrate(doc.body, plt.$orgLocNodes$ = new Map());
-    }
-    hostElm[HYDRATE_ID] = hostId;
-    hostElm.removeAttribute(HYDRATE_ID);
-    clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
-    childRenderNodes.forEach(c => {
-        const orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
-        const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
-        const node = c.$elm$;
-        if (orgLocationNode && (orgLocationNode['s-sd'] || c.$hostId$ === '0')) {
-            orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
-        }
-        if (!shadowRoot) {
-            node['s-hn'] = tagName;
-            if (orgLocationNode) {
-                node['s-ol'] = orgLocationNode;
-                node['s-ol']['s-nr'] = node;
-            }
-        }
-        plt.$orgLocNodes$.delete(orgLocationId);
-    });
-    if (BUILD.shadowDom && shadowRoot) {
-        shadowRootNodes.forEach(shadowRootNode => {
-            if (shadowRootNode) {
-                shadowRoot.appendChild(shadowRootNode);
-            }
-        });
-    }
-};
-const clientHydrate = (parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node, hostId) => {
-    let childNodeType;
-    let childIdSplt;
-    let childVNode;
-    if (node.nodeType === 1 /* ElementNode */) {
-        childNodeType = node.getAttribute(HYDRATE_CHILD_ID);
-        if (childNodeType) {
-            // got the node data from the element's attribute
-            // `${hostId}.${nodeId}.${depth}.${index}`
-            childIdSplt = childNodeType.split('.');
-            if (childIdSplt[0] === hostId || childIdSplt[0] === '0') {
-                childVNode = {
-                    $flags$: 0,
-                    $hostId$: childIdSplt[0],
-                    $nodeId$: childIdSplt[1],
-                    $depth$: childIdSplt[2],
-                    $index$: childIdSplt[3],
-                    $tag$: toLowerCase(node.tagName),
-                    $elm$: node
-                };
-                childRenderNodes.push(childVNode);
-                node.removeAttribute(HYDRATE_CHILD_ID);
-                // this is a new child vnode
-                // so ensure its parent vnode has the vchildren array
-                if (!parentVNode.$children$) {
-                    parentVNode.$children$ = [];
-                }
-                // add our child vnode to a specific index of the vnode's children
-                parentVNode.$children$[childVNode.$index$] = childVNode;
-                // this is now the new parent vnode for all the next child checks
-                parentVNode = childVNode;
-                if (shadowRootNodes && childVNode.$depth$ === '0') {
-                    shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
-                }
-            }
-        }
-        // recursively drill down, end to start so we can remove nodes
-        let i = node.childNodes.length - 1;
-        for (; i >= 0; i--) {
-            clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i], hostId);
-        }
-        if (node.shadowRoot) {
-            // keep drilling down through the shadow root nodes
-            for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
-                clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i], hostId);
-            }
-        }
-    }
-    else if (node.nodeType === 8 /* CommentNode */) {
-        // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
-        childIdSplt = node.nodeValue.split('.');
-        if (childIdSplt[1] === hostId || childIdSplt[1] === '0') {
-            // comment node for either the host id or a 0 host id
-            childNodeType = childIdSplt[0];
-            childVNode = {
-                $flags$: 0,
-                $hostId$: childIdSplt[1],
-                $nodeId$: childIdSplt[2],
-                $depth$: childIdSplt[3],
-                $index$: childIdSplt[4],
-                $elm$: node
-            };
-            if (childNodeType === TEXT_NODE_ID) {
-                childVNode.$elm$ = node.nextSibling;
-                if (childVNode.$elm$ && childVNode.$elm$.nodeType === 3 /* TextNode */) {
-                    childVNode.$text$ = childVNode.$elm$.textContent;
-                    childRenderNodes.push(childVNode);
-                    // remove the text comment since it's no longer needed
-                    node.remove();
-                    if (!parentVNode.$children$) {
-                        parentVNode.$children$ = [];
-                    }
-                    parentVNode.$children$[childVNode.$index$] = childVNode;
-                    if (shadowRootNodes && childVNode.$depth$ === '0') {
-                        shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
-                    }
-                }
-            }
-            else if (childVNode.$hostId$ === hostId) {
-                // this comment node is specifcally for this host id
-                if (childNodeType === SLOT_NODE_ID) {
-                    // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
-                    childVNode.$tag$ = 'slot';
-                    if (childIdSplt[5]) {
-                        node['s-sn'] = childVNode.$name$ = childIdSplt[5];
-                    }
-                    else {
-                        node['s-sn'] = '';
-                    }
-                    node['s-sr'] = true;
-                    if (BUILD.shadowDom && shadowRootNodes) {
-                        // browser support shadowRoot and this is a shadow dom component
-                        // create an actual slot element
-                        childVNode.$elm$ = doc.createElement(childVNode.$tag$);
-                        if (childVNode.$name$) {
-                            // add the slot name attribute
-                            childVNode.$elm$.setAttribute('name', childVNode.$name$);
-                        }
-                        // insert the new slot element before the slot comment
-                        node.parentNode.insertBefore(childVNode.$elm$, node);
-                        // remove the slot comment since it's not needed for shadow
-                        node.remove();
-                        if (childVNode.$depth$ === '0') {
-                            shadowRootNodes[childVNode.$index$] = childVNode.$elm$;
-                        }
-                    }
-                    slotNodes.push(childVNode);
-                    if (!parentVNode.$children$) {
-                        parentVNode.$children$ = [];
-                    }
-                    parentVNode.$children$[childVNode.$index$] = childVNode;
-                }
-                else if (childNodeType === CONTENT_REF_ID) {
-                    // `${CONTENT_REF_ID}.${hostId}`;
-                    if (BUILD.shadowDom && shadowRootNodes) {
-                        // remove the content ref comment since it's not needed for shadow
-                        node.remove();
-                    }
-                    else if (BUILD.slotRelocation) {
-                        hostElm['s-cr'] = node;
-                        node['s-cn'] = true;
-                    }
-                }
-            }
-        }
-    }
-    else if (parentVNode && parentVNode.$tag$ === 'style') {
-        parentVNode.$children$ = [{
-                $index$: '0',
-                $text$: node.textContent,
-                $elm$: node
-            }];
-    }
-};
-const initializeDocumentHydrate = (node, orgLocNodes) => {
-    if (node.nodeType === 1 /* ElementNode */) {
-        let i = 0;
-        for (; i < node.childNodes.length; i++) {
-            initializeDocumentHydrate(node.childNodes[i], orgLocNodes);
-        }
-        if (node.shadowRoot) {
-            for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
-                initializeDocumentHydrate(node.shadowRoot.childNodes[i], orgLocNodes);
-            }
-        }
-    }
-    else if (node.nodeType === 8 /* CommentNode */) {
-        const childIdSplt = node.nodeValue.split('.');
-        if (childIdSplt[0] === ORG_LOCATION_ID) {
-            orgLocNodes.set(childIdSplt[1] + '.' + childIdSplt[2], node);
-            node.nodeValue = '';
-            // useful to know if the original location is
-            // the root light-dom of a shadow dom component
-            node['s-sd'] = (childIdSplt[3] === '');
-        }
-    }
-};
-
-const modeResolutionChain = [];
-const computeMode = (elm) => modeResolutionChain.map(h => h(elm)).find(m => !!m);
-// Public
-const setMode = (handler) => modeResolutionChain.push(handler);
-const getMode = (ref) => getHostRef(ref).$modeName$;
-
 const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) => {
     // initializeComponent
-    if ((BUILD.lazyLoad || BUILD.style) && (hostRef.$flags$ & 256 /* hasInitializedComponent */) === 0) {
+    if ((hostRef.$flags$ & 256 /* hasInitializedComponent */) === 0) {
         // we haven't initialized this element yet
         hostRef.$flags$ |= 256 /* hasInitializedComponent */;
-        if (BUILD.mode && hostRef.$modeName$ == null) {
-            // initializeComponent
-            // looks like mode wasn't set as a property directly yet
-            // first check if there's an attribute
-            // next check the app's global
-            hostRef.$modeName$ = typeof cmpMeta.$lazyBundleIds$ !== 'string' ? computeMode(elm) : '';
-        }
-        if (BUILD.hydrateServerSide && hostRef.$modeName$) {
-            elm.setAttribute('s-mode', hostRef.$modeName$);
-        }
-        if (BUILD.lazyLoad) {
+        {
             // lazy loaded components
             // request the component's implementation to be
             // wired up with the host element
-            Cstr = await loadModule(cmpMeta, hostRef, hmrVersionId);
-            if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
-                throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
-            }
-            if (BUILD.member && !Cstr.isProxied) {
-                // we'eve never proxied this Constructor before
-                // let's add the getters/setters to its prototype before
-                // the first time we create an instance of the implementation
-                if (BUILD.watchCallback) {
-                    cmpMeta.$watchers$ = Cstr.watchers;
-                }
+            Cstr = await loadModule(cmpMeta);
+            if (!Cstr.isProxied) {
                 proxyComponent(Cstr, cmpMeta, 2 /* proxyState */);
                 Cstr.isProxied = true;
             }
             // ok, time to construct the instance
             // but let's keep track of when we start and stop
             // so that the getters/setters don't incorrectly step on data
-            if (BUILD.member) {
+            {
                 hostRef.$flags$ |= 8 /* isConstructingInstance */;
             }
             // construct the lazy-loaded component implementation
@@ -1745,20 +1260,17 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
             catch (e) {
                 consoleError(e);
             }
-            if (BUILD.member) {
+            {
                 hostRef.$flags$ &= ~8 /* isConstructingInstance */;
             }
             fireConnectedCallback(hostRef.$lazyInstance$);
         }
-        else {
-            Cstr = elm.constructor;
-        }
-        if (BUILD.style && !Cstr.isStyleRegistered && Cstr.style) {
+        if (!Cstr.isStyleRegistered && Cstr.style) {
             // this component has styles but we haven't registered them yet
             let style = Cstr.style;
             let scopeId = getScopeId(cmpMeta.$tagName$, hostRef.$modeName$);
-            if (!BUILD.hydrateServerSide && BUILD.shadowDom && cmpMeta.$flags$ & 8 /* needsShadowDomShim */) {
-                style = await __sc_import_core_documentation('./shadow-css-984bac74-549b16dd.js').then(m => m.scopeCss(style, scopeId, false));
+            if (cmpMeta.$flags$ & 8 /* needsShadowDomShim */) {
+                style = await Promise.resolve(require('./shadow-css-984bac74-b2177096.js')).then(m => m.scopeCss(style, scopeId, false));
             }
             registerStyle(scopeId, style, !!(cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */));
             Cstr.isStyleRegistered = true;
@@ -1766,7 +1278,7 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
     }
     // we've successfully created a lazy instance
     const ancestorComponent = hostRef.$ancestorComponent$;
-    if (BUILD.lifecycle && BUILD.lazyLoad && ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
+    if (ancestorComponent && !ancestorComponent['s-lr'] && ancestorComponent['s-rc']) {
         // this is the intial load and this component it has an ancestor component
         // but the ancestor component has NOT fired its will update lifecycle yet
         // so let's just cool our jets and wait for the ancestor to continue first
@@ -1782,54 +1294,33 @@ const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId, Cstr) =>
 };
 
 const fireConnectedCallback = (instance) => {
-    if (BUILD.lazyLoad && BUILD.connectedCallback) {
-        safeCall(instance, 'connectedCallback');
-    }
 };
 const connectedCallback = (elm, cmpMeta) => {
     if ((plt.$flags$ & 1 /* isTmpDisconnected */) === 0) {
         // connectedCallback
         const hostRef = getHostRef(elm);
-        if (BUILD.hostListener && cmpMeta.$listeners$) {
-            // initialize our event listeners on the host element
-            // we do this now so that we can listening to events that may
-            // have fired even before the instance is ready
-            hostRef.$rmListeners$ = addEventListeners(elm, hostRef, cmpMeta.$listeners$);
-        }
         if (!(hostRef.$flags$ & 1 /* hasConnected */)) {
             // first time this component has connected
             hostRef.$flags$ |= 1 /* hasConnected */;
             let hostId;
-            if (BUILD.hydrateClientSide) {
-                hostId = elm.getAttribute(HYDRATE_ID);
-                if (hostId) {
-                    if (BUILD.shadowDom && supportsShadowDom && cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
-                        const scopeId = addStyle(elm.shadowRoot, cmpMeta.$tagName$, elm.getAttribute('s-mode'));
-                        elm.classList.remove(scopeId + '-h');
-                        elm.classList.remove(scopeId + '-s');
-                    }
-                    initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
-                }
-            }
-            if (BUILD.slotRelocation && !hostId) {
+            if (!hostId) {
                 // initUpdate
                 // if the slot polyfill is required we'll need to put some nodes
                 // in here to act as original content anchors as we move nodes around
                 // host element has been connected to the DOM
-                if ((BUILD.hydrateServerSide) ||
-                    (BUILD.slot && cmpMeta.$flags$ & 4 /* hasSlotRelocation */) ||
-                    (BUILD.shadowDom && cmpMeta.$flags$ & 8 /* needsShadowDomShim */)) {
+                if (cmpMeta.$flags$ & 4 ||
+                    (cmpMeta.$flags$ & 8 /* needsShadowDomShim */)) {
                     setContentReference(elm);
                 }
             }
-            if (BUILD.lifecycle && BUILD.lazyLoad) {
+            {
                 // find the first ancestor component (if there is one) and register
                 // this component as one of the actively loading child components for its ancestor
                 let ancestorComponent = elm;
                 while ((ancestorComponent = (ancestorComponent.parentNode || ancestorComponent.host))) {
                     // climb up the ancestors looking for the first
                     // component that hasn't finished its lifecycle update yet
-                    if ((BUILD.hydrateClientSide && ancestorComponent.nodeType === 1 /* ElementNode */ && ancestorComponent.hasAttribute('s-id')) || (ancestorComponent['s-init'] && !ancestorComponent['s-lr'])) {
+                    if (ancestorComponent['s-init'] && !ancestorComponent['s-lr']) {
                         // we found this components first ancestor component
                         // keep a reference to this component's ancestor component
                         hostRef.$ancestorComponent$ = ancestorComponent;
@@ -1842,7 +1333,7 @@ const connectedCallback = (elm, cmpMeta) => {
             }
             // Lazy properties
             // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-            if (BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && cmpMeta.$members$) {
+            if (cmpMeta.$members$) {
                 Object.entries(cmpMeta.$members$).forEach(([memberName, [memberFlags]]) => {
                     if (memberFlags & 31 /* Prop */ && elm.hasOwnProperty(memberName)) {
                         const value = elm[memberName];
@@ -1851,14 +1342,7 @@ const connectedCallback = (elm, cmpMeta) => {
                     }
                 });
             }
-            if (BUILD.taskQueue && BUILD.mode) {
-                // connectedCallback, taskQueue, initialLoad
-                // angular sets attribute AFTER connectCallback
-                // https://github.com/angular/angular/issues/18909
-                // https://github.com/angular/angular/issues/19940
-                nextTick(() => initializeComponent(elm, hostRef, cmpMeta));
-            }
-            else {
+            {
                 initializeComponent(elm, hostRef, cmpMeta);
             }
         }
@@ -1873,34 +1357,13 @@ const setContentReference = (elm, contentRefElm) => {
     // create a node to represent where the original
     // content was first placed, which is useful later on
     let crName;
-    if (BUILD.isDebug) {
-        crName = `content-ref:${elm.tagName}`;
-    }
-    else {
+    {
         crName = '';
     }
     contentRefElm = elm['s-cr'] = doc.createComment(crName);
     contentRefElm['s-cn'] = true;
     elm.insertBefore(contentRefElm, elm.firstChild);
 };
-
-function hmrStart(elm, cmpMeta, hmrVersionId) {
-    // ¯\_(ツ)_/¯
-    const hostRef = getHostRef(elm);
-    // reset state flags to only have been connected
-    hostRef.$flags$ = 1 /* hasConnected */;
-    // TODO
-    // detatch any event listeners that may have been added
-    // because we're not passing an exact event name it'll
-    // remove all of this element's event, which is good
-    // create a callback for when this component finishes hmr
-    elm['s-hmr-load'] = () => {
-        // finished hmr for this element
-        delete elm['s-hmr-load'];
-    };
-    // re-initialize the component
-    initializeComponent(elm, hostRef, cmpMeta, hmrVersionId);
-}
 
 const bootstrapLazy = (lazyBundles, options = {}) => {
     const cmpTags = [];
@@ -1914,14 +1377,6 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
     if (options.syncQueue) {
         plt.$flags$ |= 4 /* queueSync */;
     }
-    if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-        const styles = doc.querySelectorAll('style[s-id]');
-        let globalStyles = '';
-        styles.forEach(styleElm => globalStyles += styleElm.innerHTML);
-        styles.forEach(styleElm => {
-            registerStyle(styleElm.getAttribute(HYDRATE_ID), globalStyles + convertScopedToShadow(styleElm.innerHTML), true);
-        });
-    }
     lazyBundles.forEach(lazyBundle => lazyBundle[1].forEach(compactMeta => {
         const cmpMeta = {
             $flags$: compactMeta[0],
@@ -1929,13 +1384,7 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
             $members$: compactMeta[2],
             $listeners$: compactMeta[3],
         };
-        if (BUILD.reflect) {
-            cmpMeta.$attrsToReflect$ = [];
-        }
-        if (BUILD.watchCallback) {
-            cmpMeta.$watchers$ = {};
-        }
-        if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
+        if (!supportsShadowDom && cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
             cmpMeta.$flags$ |= 8 /* needsShadowDomShim */;
         }
         const tagName = cmpMeta.$tagName$;
@@ -1945,19 +1394,19 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
                 // @ts-ignore
                 super(self);
                 self = this;
-                if (BUILD.lifecycle) {
+                {
                     this['s-lr'] = false;
                     this['s-rc'] = [];
                 }
                 registerHost(self);
-                if (BUILD.shadowDom && cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
+                if (cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
                     // this component is using shadow dom
                     // and this browser supports shadow dom
                     // add the read-only property "shadowRoot" to the host element
                     if (supportsShadowDom) {
                         self.attachShadow({ 'mode': 'open' });
                     }
-                    else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
+                    else if (!('shadowRoot' in self)) {
                         self.shadowRoot = self;
                     }
                 }
@@ -1975,12 +1424,9 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
                 }
             }
             's-hmr'(hmrVersionId) {
-                if (BUILD.hotModuleReplacement) {
-                    hmrStart(this, cmpMeta, hmrVersionId);
-                }
             }
             forceUpdate() {
-                if (BUILD.updatable) {
+                {
                     const hostRef = getHostRef(this);
                     scheduleUpdate(this, hostRef, cmpMeta, false);
                 }
@@ -2001,49 +1447,10 @@ const bootstrapLazy = (lazyBundles, options = {}) => {
     head.insertBefore(visibilityStyle, y ? y.nextSibling : head.firstChild);
 };
 
-const attachShadow = (el) => {
-    if (supportsShadowDom) {
-        el.attachShadow({ mode: 'open' });
-    }
-    else {
-        el.shadowRoot = el;
-    }
-};
-const proxyNative = (Cstr, compactMeta) => {
-    const cmpMeta = {
-        $flags$: compactMeta[0],
-        $tagName$: compactMeta[1],
-        $members$: compactMeta[2],
-        $listeners$: compactMeta[3],
-        $watchers$: Cstr.$watchers$
-    };
-    if (BUILD.reflect) {
-        cmpMeta.$attrsToReflect$ = [];
-    }
-    if (BUILD.shadowDom && !supportsShadowDom && cmpMeta.$flags$ & 1 /* shadowDomEncapsulation */) {
-        cmpMeta.$flags$ |= 8 /* needsShadowDomShim */;
-    }
-    Object.assign(Cstr.prototype, {
-        forceUpdate() {
-            if (BUILD.updatable) {
-                const hostRef = getHostRef(this);
-                scheduleUpdate(this, hostRef, cmpMeta, false);
-            }
-        },
-        connectedCallback() {
-            connectedCallback(this, cmpMeta);
-        },
-        disconnectedCallback() {
-            disconnectedCallback(this);
-        }
-    });
-    return proxyComponent(Cstr, cmpMeta, 1 /* isElementConstructor */ | 2 /* proxyState */);
-};
-
 const createEvent = (ref, name, flags) => {
     const elm = getElement(ref);
     return {
-        emit: (detail) => elm.dispatchEvent(new (BUILD.hydrateServerSide ? win.CustomEvent : CustomEvent)(name, {
+        emit: (detail) => elm.dispatchEvent(new (CustomEvent)(name, {
             bubbles: !!(flags & 4 /* Bubbles */),
             composed: !!(flags & 2 /* Composed */),
             cancelable: !!(flags & 1 /* Cancellable */),
@@ -2052,187 +1459,12 @@ const createEvent = (ref, name, flags) => {
     };
 };
 
-const getAssetPath = (path) => {
-    const assetUrl = new URL(path, plt.$resourcesUrl$);
-    return (assetUrl.origin !== win.location.origin)
-        ? assetUrl.href
-        : assetUrl.pathname;
-};
+const getElement = (ref) => getHostRef(ref).$hostElement$;
 
-const getConnect = (_ref, tagName) => {
-    function componentOnReady() {
-        let elm = doc.querySelector(tagName);
-        if (!elm) {
-            elm = doc.createElement(tagName);
-            doc.body.appendChild(elm);
-        }
-        return typeof elm.componentOnReady === 'function' ? elm.componentOnReady() : Promise.resolve(elm);
-    }
-    function create(...args) {
-        return componentOnReady()
-            .then(el => el.create(...args));
-    }
-    return {
-        create,
-        componentOnReady,
-    };
-};
-
-const getContext = (_elm, context) => {
-    if (context in Context) {
-        return Context[context];
-    }
-    else if (context === 'window') {
-        return win;
-    }
-    else if (context === 'document') {
-        return doc;
-    }
-    else if (context === 'isServer' || context === 'isPrerender') {
-        return !!BUILD.hydrateServerSide;
-    }
-    else if (context === 'isClient') {
-        return !BUILD.hydrateServerSide;
-    }
-    else if (context === 'resourcesUrl' || context === 'publicPath') {
-        return getAssetPath('.');
-    }
-    else if (context === 'queue') {
-        return {
-            write: writeTask,
-            read: readTask,
-            tick: {
-                then(cb) {
-                    return nextTick(cb);
-                }
-            }
-        };
-    }
-    return undefined;
-};
-
-const getElement = (ref) => BUILD.lazyLoad ? getHostRef(ref).$hostElement$ : ref;
-
-const insertVdomAnnotations = (doc) => {
-    if (doc != null) {
-        const docData = {
-            hostIds: 0,
-            rootLevelIds: 0
-        };
-        const orgLocationNodes = [];
-        parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
-        orgLocationNodes.forEach(orgLocationNode => {
-            if (orgLocationNode != null) {
-                const nodeRef = orgLocationNode['s-nr'];
-                let hostId = nodeRef['s-host-id'];
-                let nodeId = nodeRef['s-node-id'];
-                let childId = `${hostId}.${nodeId}`;
-                if (hostId == null) {
-                    hostId = 0;
-                    docData.rootLevelIds++;
-                    nodeId = docData.rootLevelIds;
-                    childId = `${hostId}.${nodeId}`;
-                    if (nodeRef.nodeType === 1 /* ElementNode */) {
-                        nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
-                    }
-                    else if (nodeRef.nodeType === 3 /* TextNode */) {
-                        if (hostId === 0) {
-                            const textContent = nodeRef.nodeValue.trim();
-                            if (textContent === '') {
-                                // useless whitespace node at the document root
-                                orgLocationNode.remove();
-                                return;
-                            }
-                        }
-                        const commentBeforeTextNode = doc.createComment(childId);
-                        commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
-                        nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
-                    }
-                }
-                let orgLocationNodeId = `${ORG_LOCATION_ID}.${childId}`;
-                const orgLocationParentNode = orgLocationNode.parentElement;
-                if (orgLocationParentNode && orgLocationParentNode['s-sd']) {
-                    // ending with a . means that the parent element
-                    // of this node's original location is a shadow dom element
-                    // and this node is apart of the root level light dom
-                    orgLocationNodeId += `.`;
-                }
-                orgLocationNode.nodeValue = orgLocationNodeId;
-            }
-        });
-    }
-};
-const parseVNodeAnnotations = (doc, node, docData, orgLocationNodes) => {
-    if (node == null) {
-        return;
-    }
-    if (node['s-nr'] != null) {
-        orgLocationNodes.push(node);
-    }
-    if (node.nodeType === 1 /* ElementNode */) {
-        node.childNodes.forEach(childNode => {
-            const hostRef = getHostRef(childNode);
-            if (hostRef != null) {
-                const cmpData = {
-                    nodeIds: 0
-                };
-                insertVNodeAnnotations(doc, childNode, hostRef.$vnode$, docData, cmpData);
-            }
-            parseVNodeAnnotations(doc, childNode, docData, orgLocationNodes);
-        });
-    }
-};
-const insertVNodeAnnotations = (doc, hostElm, vnode, docData, cmpData) => {
-    if (vnode != null) {
-        const hostId = ++docData.hostIds;
-        hostElm.setAttribute(HYDRATE_ID, hostId);
-        if (hostElm['s-cr'] != null) {
-            hostElm['s-cr'].nodeValue = `${CONTENT_REF_ID}.${hostId}`;
-        }
-        if (vnode.$children$ != null) {
-            const depth = 0;
-            vnode.$children$.forEach((vnodeChild, index) => {
-                insertChildVNodeAnnotations(doc, vnodeChild, cmpData, hostId, depth, index);
-            });
-        }
-    }
-};
-const insertChildVNodeAnnotations = (doc, vnodeChild, cmpData, hostId, depth, index) => {
-    const childElm = vnodeChild.$elm$;
-    if (childElm == null) {
-        return;
-    }
-    const nodeId = cmpData.nodeIds++;
-    const childId = `${hostId}.${nodeId}.${depth}.${index}`;
-    childElm['s-host-id'] = hostId;
-    childElm['s-node-id'] = nodeId;
-    if (childElm.nodeType === 1 /* ElementNode */) {
-        childElm.setAttribute(HYDRATE_CHILD_ID, childId);
-    }
-    else if (childElm.nodeType === 3 /* TextNode */) {
-        const parentNode = childElm.parentNode;
-        if (parentNode.nodeName !== 'STYLE') {
-            const textNodeId = `${TEXT_NODE_ID}.${childId}`;
-            const commentBeforeTextNode = doc.createComment(textNodeId);
-            parentNode.insertBefore(commentBeforeTextNode, childElm);
-        }
-    }
-    else if (childElm.nodeType === 8 /* CommentNode */) {
-        if (childElm['s-sr']) {
-            const slotName = (childElm['s-sn'] || '');
-            const slotNodeId = `${SLOT_NODE_ID}.${childId}.${slotName}`;
-            childElm.nodeValue = slotNodeId;
-        }
-    }
-    if (vnodeChild.$children$ != null) {
-        const childDepth = depth + 1;
-        vnodeChild.$children$.forEach((vnode, index) => {
-            insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
-        });
-    }
-};
-
-function globals() {
-}
-
-export { Host as H, patchEsm as a, bootstrapLazy as b, createEvent as c, globals as g, h, patchBrowser as p, registerInstance as r };
+exports.Host = Host;
+exports.bootstrapLazy = bootstrapLazy;
+exports.createEvent = createEvent;
+exports.h = h;
+exports.patchBrowser = patchBrowser;
+exports.patchEsm = patchEsm;
+exports.registerInstance = registerInstance;
