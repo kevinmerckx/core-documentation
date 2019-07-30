@@ -1,7 +1,9 @@
 {
   "entries": [
-    "components/core-code/core-code.js",
+    "components/core-page/core-page.js",
     "components/core-copy-button/core-copy-button.js",
+    "components/core-section/core-section.js",
+    "components/core-code/core-code.js",
     "components/core-tabs/core-tabs.js",
     "components/core-component-api/core-component-api.js"
   ],

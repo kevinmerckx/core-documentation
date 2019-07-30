@@ -1,4 +1,4 @@
-import { Component, Prop } from "@stencil/core";
+import { Component, Prop, h, Host, State, Element } from "@stencil/core";
 
 @Component({
   tag: 'core-page',
@@ -7,35 +7,53 @@ import { Component, Prop } from "@stencil/core";
 })
 export class CorePage {
   @Prop() noNavigation = false;
-  @Prop() title = '';
+  @Prop() pageTitle = '';
+
+  @State() private sections: Array<string> = [];
+  @State() private activeSection: string;
+
+  @Element() element: HTMLElement;
+
+  componentDidRender() {
+    const sections = [];
+    this.element.querySelectorAll('core-section').forEach(section => sections.push(section.sectionTitle));
+    if (sections.join(',') !== this.sections.join(',')) {
+      this.sections = sections;
+    }
+    if (!this.activeSection) {
+      this.activeSection = sections[0];
+    }
+  }
 
   render() {
-    <div class="header" *ngIf="!noNavigation">
-    <h1>{{title}}</h1>
+    return <Host>
+      {this.renderNavigation()}
+      <div class="content">
+        <slot/>
+      </div>
+    </Host>;
+  }
 
-    <ol>
-      <ng-template ngFor [ngForOf]="sections$ | async" let-section>
-        <li
-          [class.active]="(activeSection$ | async) === section"
-          (click)="selectSection(section)"
-        >{{section.title}}</li>
-      </ng-template>
-    </ol>
-  </div>
+  private select(section: string) {
+    this.activeSection = section;
+    this.element.querySelector(`core-section[section-title="${section}"]`).scrollIntoView();
+  }
 
-  <div class="content"
-    [docsAnchorContainer]="(activeSection$ | async).title"
-    [docsAnchor]="firstSectionTitle$ | async">
-    <ng-template ngFor [ngForOf]="sections$ | async" let-section let-first="first">
-      <h2
-        *ngIf="(!first || noNavigation) && section.title"
-        [docsAnchor]="section.title"
-      >{{section.title}}</h2>
+  private renderNavigation() {
+    if (this.noNavigation) {
+      return;
+    }
+    return <div class="header">
+      <h1>{this.pageTitle}</h1>
 
-      <ng-container [ngTemplateOutlet]="section.template"></ng-container>
-    </ng-template>
-  </div>
-
-
+      <ol>
+        {this.sections.map(section => {
+          return <li
+            class={(section === this.activeSection) ? 'active' : '' }
+            onClick={() => this.select(section)}
+          >{section}</li>;
+        })}
+      </ol>
+    </div>;
   }
 }

@@ -25,6 +25,14 @@ export namespace Components {
   interface CoreCopyButton {
     'copy': (valueToCopy: string) => Promise<void>;
   }
+  interface CorePage {
+    'noNavigation': boolean;
+    'pageTitle': string;
+  }
+  interface CoreSection {
+    'hideTitle': boolean;
+    'sectionTitle': string;
+  }
   interface CoreTabs {
     'tabs': string[] | string;
   }
@@ -51,6 +59,18 @@ declare global {
     new (): HTMLCoreCopyButtonElement;
   };
 
+  interface HTMLCorePageElement extends Components.CorePage, HTMLStencilElement {}
+  var HTMLCorePageElement: {
+    prototype: HTMLCorePageElement;
+    new (): HTMLCorePageElement;
+  };
+
+  interface HTMLCoreSectionElement extends Components.CoreSection, HTMLStencilElement {}
+  var HTMLCoreSectionElement: {
+    prototype: HTMLCoreSectionElement;
+    new (): HTMLCoreSectionElement;
+  };
+
   interface HTMLCoreTabsElement extends Components.CoreTabs, HTMLStencilElement {}
   var HTMLCoreTabsElement: {
     prototype: HTMLCoreTabsElement;
@@ -60,6 +80,8 @@ declare global {
     'core-code': HTMLCoreCodeElement;
     'core-component-api': HTMLCoreComponentApiElement;
     'core-copy-button': HTMLCoreCopyButtonElement;
+    'core-page': HTMLCorePageElement;
+    'core-section': HTMLCoreSectionElement;
     'core-tabs': HTMLCoreTabsElement;
   }
 }
@@ -77,6 +99,14 @@ declare namespace LocalJSX {
   interface CoreCopyButton extends JSXBase.HTMLAttributes<HTMLCoreCopyButtonElement> {
     'onCopyClicked'?: (event: CustomEvent<any>) => void;
   }
+  interface CorePage extends JSXBase.HTMLAttributes<HTMLCorePageElement> {
+    'noNavigation'?: boolean;
+    'pageTitle'?: string;
+  }
+  interface CoreSection extends JSXBase.HTMLAttributes<HTMLCoreSectionElement> {
+    'hideTitle'?: boolean;
+    'sectionTitle'?: string;
+  }
   interface CoreTabs extends JSXBase.HTMLAttributes<HTMLCoreTabsElement> {
     'onSelected'?: (event: CustomEvent<string>) => void;
     'tabs'?: string[] | string;
@@ -86,6 +116,8 @@ declare namespace LocalJSX {
     'core-code': CoreCode;
     'core-component-api': CoreComponentApi;
     'core-copy-button': CoreCopyButton;
+    'core-page': CorePage;
+    'core-section': CoreSection;
     'core-tabs': CoreTabs;
   }
 }

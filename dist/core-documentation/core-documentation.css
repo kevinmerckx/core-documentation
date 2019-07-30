@@ -1,1 +1,10 @@
-:root{--color-one:#28c8ff;--color-two:#28a2ff;--color-three:#ff793f;--color-four:#ff4d00;--color-five:#e20;--color-light-grey:#d3d3d3;--color-bg-code:#3b3b3b;--color-text-code:#cdcdcd}
+:root {
+  --color-one: #28C8FF;
+  --color-two: #28A2FF;
+  --color-three: #FF793F;
+  --color-four: #FF4D00;
+  --color-five: #EE2200;
+  --color-light-grey: lightgrey;
+  --color-bg-code: #3b3b3b;
+  --color-text-code: #cdcdcd;
+}
